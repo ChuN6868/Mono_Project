@@ -1,8 +1,8 @@
 <!-- Angular Materialを用いたヘッダー作成 -->
-<div>
+<div class="custom-app-wrapper">
   <!-- ヘッダー -->
   <mat-toolbar color="primary" class="custom-header">
-    <button mat-icon-button class="menu-button">
+    <button mat-icon-button (click)="toggleSidebar()" class="menu-button">
       <mat-icon>menu</mat-icon>
     </button>
     <span class="header-title">ほげほげシステム</span>
@@ -13,5 +13,23 @@
       <span class="user-role">(管理者)</span>
     </div>
   </mat-toolbar>
+
+  <!-- サイドバー及びメインコンテンツ -->
+  <div class="custom-main-container">
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav [opened]="isSidebarOpen" [mode]="'side'" class="custom-sidebar">
+        <mat-nav-list>
+          @for (item of menuItems; track item.route) {
+          <mat-list-item [routerLink]="item.route" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </mat-list-item>
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+      <mat-sidenav-content class="custom-content">
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
 </div>
-<router-outlet></router-outlet>
