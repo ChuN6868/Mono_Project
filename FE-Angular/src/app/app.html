@@ -1,11 +1,17 @@
+<!-- Angular Materialを用いたヘッダー作成 -->
 <div>
-  <mat-toolbar color="primary">
-    <span>ほげほげシステム</span>
-    <mat-icon>account_circle</mat-icon>
+  <!-- ヘッダー -->
+  <mat-toolbar color="primary" class="custom-header">
+    <button mat-icon-button class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="header-title">ほげほげシステム</span>
+    <span class="spacer"></span>
+    <div class="user-info">
+      <mat-icon class="user-icon">account_circle</mat-icon>
+      <span class="user-name">山田太郎</span>
+      <span class="user-role">(管理者)</span>
+    </div>
   </mat-toolbar>
 </div>
-<nav>
-  <a routerLink="/">csvインポート</a>
-</nav>
-<hr />
 <router-outlet></router-outlet>
