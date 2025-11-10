@@ -7,6 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './csv-import.css',
 })
 export class CsvImport {
+  /** CSVファイルの内容を保持する変数 */
+  public csvContent: string = '';
+
   /** ファイルのオブジェクト自体の読み取り */
   public onFileSelected(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -60,6 +63,7 @@ export class CsvImport {
         }
 
         console.log('CSVファイルの内容: ', csvContent);
+        this.csvContent = csvContent;
 
         // より堅牢なCSV解析
         const parseData = this.parseCsvContent(csvContent);

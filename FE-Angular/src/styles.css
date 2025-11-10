@@ -5,7 +5,6 @@
   display: inline-block;
   color: #000;
   text-align: center;
-  font-family: Inter;
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
@@ -26,3 +25,5 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
