@@ -1,9 +1,8 @@
-version: '3.8'
 services:
   frontend:
     build: ./FE-Angular
     ports:
-      - "4200:4200"
+      - "4201:4200" # ホスト側のポートを4201に変更
     networks:
       - app-network
     volumes:
