@@ -1,116 +1,13 @@
 <!-- Angular Materialを用いたヘッダー作成 -->
 <div class="custom-app-wrapper">
-  <!-- ヘッダー -->
-  <mat-toolbar color="primary" class="custom-header">
-    <button mat-icon-button (click)="toggleSidebar()" class="menu-button">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <span class="header-title">ほげほげシステム</span>
-    <span class="spacer"></span>
-    <div class="user-info">
-      <mat-icon class="user-icon">account_circle</mat-icon>
-      <span class="user-name">山田太郎</span>
-      <span class="user-role">(管理者)</span>
-    </div>
-  </mat-toolbar>
+  <!-- ヘッダー（2025/12 別コンポネントに分離した） -->
+  <app-header (menuClick)="toggleSidebar()"></app-header>
 
   <!-- サイドバー＋メインコンテンツエリア：mat-sidenav-containerで囲むことで横並びレイアウトを実現 -->
   <mat-sidenav-container class="sidenav-container">
     <!-- サイドバーエリア -->
     <mat-sidenav [opened]="isSidebarOpen" [mode]="'side'" class="sidebar">
-      <mat-nav-list>
-        <!-- @forはAngular 17以降で導入された、*ngForよりも高速で効率的なループ構文 -->
-        @for (item of menuItems; track item.menuId) {
-        <ng-container>
-          <!-- 第一階層 -->
-          <!-- pathがある場合はdivタグにリンクを追加 -->
-          @if (item.path && item.path !== '') {
-          <div mat-list-item [routerLink]="item.path" class="sidebar-menu-item sidebar-menu1-item">
-            <mat-icon matListItemIcon>{{ item.iconId }}</mat-icon>
-            <span class="sidebar-menu-item-name">{{ item.menuName }}</span>
-          </div>
-          }
-          <!-- pathが無い場合はdivタグにtoggleMenuを追加 -->
-          @else {
-          <div
-            mat-list-item
-            (click)="toggleMenu(item)"
-            (keydown.enter)="toggleMenu(item)"
-            (keydown.space)="toggleMenu(item)"
-            tabindex="0"
-            role="button"
-            class="sidebar-menu-item sidebar-menu1-item"
-          >
-            <mat-icon matListItemIcon>{{ item.iconId }}</mat-icon>
-            <span class="sidebar-menu-item-name">{{ item.menuName }}</span>
-            <!-- 子メニューがある場合は展開/折りたたみアイコンを表示 -->
-            @if (item.children && item.children.length > 0) {
-            <mat-icon class="sidebar-expand-icon" [class.expanded]="item.expanded"> expand_more </mat-icon>
-            }
-          </div>
-          }
-
-          <!-- 第二階層 -->
-          @if (item.expanded && item.children && item.children.length > 0 && item.expanded) {
-          <ng-container>
-            @for (subItem of item.children; track subItem.menuId) {
-            <!-- pathがある場合はdivタグにリンクを追加 -->
-            @if (subItem.path && subItem.path !== '') {
-            <div
-              mat-list-item
-              [routerLink]="subItem.path"
-              class="sidebar-menu-item sidebar-menu2-item"
-            >
-              <mat-icon>{{ subItem.iconId }}</mat-icon>
-              <span class="sidebar-menu-item-name">
-                {{ subItem.menuName }}
-              </span>
-            </div>
-            }
-            <!-- pathが無い場合はdivタグにtoggleMenuを追加 -->
-            @else {
-            <div
-              mat-list-item
-              (click)="toggleMenu(subItem)"
-              (keydown.enter)="toggleMenu(subItem)"
-              (keydown.space)="toggleMenu(subItem)"
-              tabindex="0"
-              role="button"
-              class="sidebar-menu-item sidebar-menu2-item"
-            >
-              <mat-icon>{{ subItem.iconId }}</mat-icon>
-              <span class="sidebar-menu-item-name">{{ subItem.menuName }} </span>
-
-              <!-- 子メニューがある場合は展開/折りたたみアイコンを表示 -->
-              @if (subItem.children && subItem.children.length > 0) {
-              <mat-icon class="sidebar-expand-icon" [class.expanded]="subItem.expanded">
-                expand_more
-              </mat-icon>
-              }
-            </div>
-            }
-
-            <!-- 第三階層 -->
-            @if (subItem.expanded && subItem.children && subItem.children.length > 0) {
-            <ng-container>
-              @for (subSubItem of subItem.children; track subSubItem.menuId) {
-              <!-- 一番下の階層のため、必ずpathがあると仮定するため、リンク付きdivタグを使用 -->
-              <div
-                mat-list-item
-                [routerLink]="subSubItem.path"
-                class="sidebar-menu-item sidebar-menu3-item"
-              >
-                <mat-icon>{{ subSubItem.iconId }}</mat-icon>
-                <span class="sidebar-menu-item-name">{{ subSubItem.menuName }}</span>
-              </div>
-              }
-            </ng-container>
-            } }
-          </ng-container>
-          }
-        </ng-container>
-        }
-      </mat-nav-list>
+      <app-sidebar></app-sidebar>
     </mat-sidenav>
     <!-- メインコンテンツエリア: サイドバーの右側に表示される部分 -->
     <mat-sidenav-content class="custom-content">

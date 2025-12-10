@@ -1,0 +1,12 @@
+<mat-toolbar color="primary" class="custom-header">
+  <button mat-icon-button (click)="onMenuClick()" class="menu-button">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="header-title">ほげほげシステム</span>
+  <span class="spacer"></span>
+  <div class="user-info">
+    <mat-icon class="user-icon">account_circle</mat-icon>
+    <span class="user-name">{{ currentUser?.displayName }}</span>
+    <span class="user-role">({{ currentUser?.role }})</span>
+  </div>
+</mat-toolbar>
