@@ -1,0 +1,72 @@
+/* ヘッダー */
+/* 目的: ヘッダーを常に画面上部に固定表示し、スクロールしても見えるようにする
+ * - position: sticky; top: 0; でスクロール時もヘッダーを上部に固定
+ * - z-index: 1000; で他の要素より前面に表示し、コンテンツに隠れないようにする
+ * - box-shadow でヘッダーとコンテンツの境界を視覚的に明確化
+ */
+.custom-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 目的: メニューボタンとタイトルの間に適切な余白を確保し、視覚的なバランスを保つ */
+.menu-button {
+  margin-right: 16px;
+}
+
+/* 目的: ヘッダータイトルを適切なサイズと太さで表示し、可読性を向上
+ * - font-size: 20px; で見やすいサイズを設定
+ * - font-weight: 500; で適度な太さにして視認性を確保
+ */
+.header-title {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* 目的: ヘッダー内の左側要素と右側要素の間に可変の余白を作成
+ * - flex: 1 1 auto; でタイトルとユーザー情報の間のスペースを自動調整
+ * - これによりユーザー情報を右端に配置
+ */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* 目的: ユーザー情報エリアの要素を横並びに配置し、中央揃えにする
+ * - display: flex; でアイコン、名前、役割を横並びに配置
+ * - align-items: center; で縦方向の中央揃えを実現
+ * - gap: 8px; で各要素間に均等な余白を設定
+ */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 目的: ユーザーアイコンを適切なサイズで表示
+ * - font-size, width, height を32pxに統一し、アイコンが正しく表示されるようにする
+ */
+.user-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+/* 目的: ユーザー名を見やすいサイズと太さで表示
+ * - font-size: 14px; で適度なサイズを設定
+ * - font-weight: 500; で名前を強調して可読性を向上
+ */
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 目的: ユーザーの役割を控えめに表示し、名前との視覚的階層を作る
+ * - font-size: 12px; で名前より小さく表示
+ * - opacity: 0.8; で薄く表示し、補足情報であることを示す
+ */
+.user-role {
+  font-size: 12px;
+  opacity: 0.8;
+}

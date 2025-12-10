@@ -1,0 +1,46 @@
+/* サイドバー共通 */
+.sidebar-menu-item {
+  cursor: pointer; /* メニューアイテムにポインターカーソルを表示 */
+  min-height: 48px;
+  display: flex; /* Flexboxレイアウトを有効化 */
+  align-items: center; /* 垂直方向に中央揃え */
+  position: relative; /* 展開アイコンの絶対配置用の基準位置 */
+}
+
+.sidebar-menu-item:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+/* サイドバー第１階層：閲覧 or 改定用 */
+.sidebar-menu1-item {
+  padding-left: 20px; /* 左パディングを追加 */
+}
+
+/* サイドバー第２階層：管下用 */
+.sidebar-menu2-item {
+  padding-left: 40px; /* 左パディングを追加 */
+}
+
+/* サイドバー第３階層：部門 or 支社用 */
+.sidebar-menu3-item {
+  padding-left: 60px; /* 左パディングを追加 */
+}
+
+.sidebar-menu-item-name {
+  margin-left: 10px; /* アイコンとテキストの間にスペースを追加 */
+}
+
+/* 展開/折りたたみアイコンのスタイル */
+.sidebar-expand-icon {
+  margin-left: auto; /* アイコンを右端に配置 */
+  margin-right: 16px; /* アイコンの右側に余白を追加 */
+  color: #666; /* アイコンの色をグレーに設定 */
+  transition: transform 0.3s ease; /* 回転アニメーション（0.3秒でスムーズに） */
+  transform: rotate(0deg); /* 初期状態: 閉じている時は下向き矢印（0度） */
+}
+
+/* 展開時のアイコン回転 */
+.sidebar-expand-icon.expanded {
+  transform: rotate(180deg); /* 開いている時は上向き矢印（180度回転） */
+}

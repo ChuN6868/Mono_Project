@@ -9,79 +9,6 @@
   min-height: 100vh;
 }
 
-/* ヘッダー */
-/* 目的: ヘッダーを常に画面上部に固定表示し、スクロールしても見えるようにする
- * - position: sticky; top: 0; でスクロール時もヘッダーを上部に固定
- * - z-index: 1000; で他の要素より前面に表示し、コンテンツに隠れないようにする
- * - box-shadow でヘッダーとコンテンツの境界を視覚的に明確化
- */
-.custom-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 目的: メニューボタンとタイトルの間に適切な余白を確保し、視覚的なバランスを保つ */
-.menu-button {
-  margin-right: 16px;
-}
-
-/* 目的: ヘッダータイトルを適切なサイズと太さで表示し、可読性を向上
- * - font-size: 20px; で見やすいサイズを設定
- * - font-weight: 500; で適度な太さにして視認性を確保
- */
-.header-title {
-  font-size: 20px;
-  font-weight: 500;
-}
-
-/* 目的: ヘッダー内の左側要素と右側要素の間に可変の余白を作成
- * - flex: 1 1 auto; でタイトルとユーザー情報の間のスペースを自動調整
- * - これによりユーザー情報を右端に配置
- */
-.spacer {
-  flex: 1 1 auto;
-}
-
-/* 目的: ユーザー情報エリアの要素を横並びに配置し、中央揃えにする
- * - display: flex; でアイコン、名前、役割を横並びに配置
- * - align-items: center; で縦方向の中央揃えを実現
- * - gap: 8px; で各要素間に均等な余白を設定
- */
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* 目的: ユーザーアイコンを適切なサイズで表示
- * - font-size, width, height を32pxに統一し、アイコンが正しく表示されるようにする
- */
-.user-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
-}
-
-/* 目的: ユーザー名を見やすいサイズと太さで表示
- * - font-size: 14px; で適度なサイズを設定
- * - font-weight: 500; で名前を強調して可読性を向上
- */
-.user-name {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* 目的: ユーザーの役割を控えめに表示し、名前との視覚的階層を作る
- * - font-size: 12px; で名前より小さく表示
- * - opacity: 0.8; で薄く表示し、補足情報であることを示す
- */
-.user-role {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
 /* サイドナビコンテナ */
 /* 目的: ヘッダー以外の残りの画面領域をサイドバーとコンテンツで使用
  * - flex: 1; でヘッダーを除く残りのスペースを全て使用
@@ -98,53 +25,6 @@
  */
 .sidebar {
   width: 280px;
-}
-
-/* サイドバー共通 */
-.sidebar-menu-item {
-  cursor: pointer; /* メニューアイテムにポインターカーソルを表示 */
-  min-height: 48px;
-  display: flex; /* Flexboxレイアウトを有効化 */
-  align-items: center; /* 垂直方向に中央揃え */
-  position: relative; /* 展開アイコンの絶対配置用の基準位置 */
-}
-
-.sidebar-menu-item:hover {
-  background-color: lightgray;
-  cursor: pointer;
-}
-
-/* サイドバー第１階層：閲覧 or 改定用 */
-.sidebar-menu1-item {
-  padding-left: 20px; /* 左パディングを追加 */
-}
-
-/* サイドバー第２階層：管下用 */
-.sidebar-menu2-item {
-  padding-left: 40px; /* 左パディングを追加 */
-}
-
-/* サイドバー第３階層：部門 or 支社用 */
-.sidebar-menu3-item {
-  padding-left: 60px; /* 左パディングを追加 */
-}
-
-.sidebar-menu-item-name {
-  margin-left: 10px; /* アイコンとテキストの間にスペースを追加 */
-}
-
-/* 展開/折りたたみアイコンのスタイル */
-.sidebar-expand-icon {
-  margin-left: auto; /* アイコンを右端に配置 */
-  margin-right: 16px; /* アイコンの右側に余白を追加 */
-  color: #666; /* アイコンの色をグレーに設定 */
-  transition: transform 0.3s ease; /* 回転アニメーション（0.3秒でスムーズに） */
-  transform: rotate(0deg); /* 初期状態: 閉じている時は下向き矢印（0度） */
-}
-
-/* 展開時のアイコン回転 */
-.sidebar-expand-icon.expanded {
-  transform: rotate(180deg); /* 開いている時は上向き矢印（180度回転） */
 }
 
 /* コンテンツエリア */
