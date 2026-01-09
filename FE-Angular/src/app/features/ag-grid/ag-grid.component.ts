@@ -13,8 +13,14 @@ export class AgGridComponent {
   // テーマ設定（新しいTheming API）
   theme = themeQuartz;
 
-  // 列の移動を無効化（デフォルトだとドラッグで列を移動できてしまう）
-  suppressMovableColumns = true;
+  
+  
+
+  // デフォルトの列設定（全列に適用される）
+  defaultColDef: ColDef = {
+    sortable: false, // ソート無効化（デフォルトだとソート機能がある）
+    suppressMovable: true, // 列の移動を無効化（デフォルトだとドラッグで列を移動できてしまう）
+  };
 
   // 列定義
   colDefs: ColDef[] = [
