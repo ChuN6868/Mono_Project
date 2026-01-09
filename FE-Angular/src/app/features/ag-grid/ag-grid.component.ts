@@ -29,8 +29,11 @@ export class AgGridComponent {
 
   // 列定義
   colDefs: ColDef[] = [
-    { field: 'id', headerName: 'ID' },
-    { field: 'make', headerName: 'メーカー' },
+    // ===== 固定列=====
+    { field: 'id', headerName: 'ID', pinned: 'left', minWidth: 70, width: 70 }, // 左側に固定（pinned: 'right'で右側固定も可能）
+    { field: 'make', headerName: 'メーカー', pinned: 'left', minWidth: 100 },
+
+    // ===== スクロール列 =====
     { field: 'model', headerName: 'モデル' },
     { field: 'price', headerName: '価格' },
     { field: 'year', headerName: '年式' },
