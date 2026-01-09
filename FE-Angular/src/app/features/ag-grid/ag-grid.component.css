@@ -1,0 +1,68 @@
+/* 列表示設定パネル */
+.column-panel {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+/* パネルヘッダー */
+.column-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+}
+
+.column-panel-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.column-panel-actions button {
+  min-width: auto;
+}
+
+/* パネルコンテンツ */
+.column-panel-content {
+  padding: 12px 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* 列アイテム */
+.column-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.column-item:last-child {
+  border-bottom: none;
+}
+
+.column-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.column-item input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}

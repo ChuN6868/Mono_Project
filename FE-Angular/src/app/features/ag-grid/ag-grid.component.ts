@@ -1,20 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButton } from '@angular/material/button';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, themeQuartz } from 'ag-grid-community';
+
+// 列の表示状態を管理するインターフェース
+interface ColumnVisibility {
+  field: string;
+  headerName: string;
+  visible: boolean;
+}
 
 @Component({
   selector: 'app-ag-grid',
   standalone: true,
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, MatButton, CommonModule],
   templateUrl: './ag-grid.component.html',
   styleUrl: './ag-grid.component.css'
 })
-export class AgGridComponent {
-  // テーマ設定（新しいTheming API）
+export class AgGridComponent implements OnInit {
+  // AG Gridのインスタンスへの参照
+  @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
+
+  // テーマ設定（新しいTheming API。AG Grid v33以降）
   theme = themeQuartz;
 
-  
-  
+  // 列表示設定パネルの表示状態
+  showColumnPanel = false;
+
+  // 列の表示状態リスト
+  columnVisibilityList: ColumnVisibility[] = [];
 
   // デフォルトの列設定（全列に適用される）
   defaultColDef: ColDef = {
@@ -67,4 +82,47 @@ export class AgGridComponent {
     { id: 19, make: 'Mini', model: 'Cooper', price: 35000, year: 2022, color: '青', mileage: 6000, fuelType: 'ガソリン', transmission: 'AT', status: '在庫あり' },
     { id: 20, make: '長文あああああああああああああああああああああああああああああああああああああああああああああああああああああ', model: 'i30000000000000000000000000000000000000000000000000000000000000', price: 260000000000000000000000000000000, year: 2021000000000000000000000000000000000, color: '灰', mileage: 17000, fuelType: 'ガソリン', transmission: 'AT', status: '在庫ありaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
   ];
+
+  // コンポーネント初期化時に列の表示状態リストを作成
+  ngOnInit() {
+    this.columnVisibilityList = this.colDefs.map(col => ({
+      field: col.field!,
+      headerName: col.headerName!,
+      visible: true
+    }));
+  }
+
+  // 列表示設定パネルを開閉
+  toggleColumnPanel() {
+    this.showColumnPanel = !this.showColumnPanel;
+  }
+
+  // 列の表示/非表示を切り替え
+  toggleColumnVisibility(field: string) {
+    const columnApi = this.agGrid.api;
+    const column = this.columnVisibilityList.find(col => col.field === field);
+
+    if (column) {
+      column.visible = !column.visible;
+      columnApi.setColumnsVisible([field], column.visible);
+    }
+  }
+
+  // 全選択
+  selectAllColumns() {
+    const columnApi = this.agGrid.api;
+    const allFields = this.columnVisibilityList.map(col => col.field);
+
+    this.columnVisibilityList.forEach(col => col.visible = true);
+    columnApi.setColumnsVisible(allFields, true);
+  }
+
+  // 全削除（全て非表示）
+  deselectAllColumns() {
+    const columnApi = this.agGrid.api;
+    const allFields = this.columnVisibilityList.map(col => col.field);
+
+    this.columnVisibilityList.forEach(col => col.visible = false);
+    columnApi.setColumnsVisible(allFields, false);
+  }
 }
