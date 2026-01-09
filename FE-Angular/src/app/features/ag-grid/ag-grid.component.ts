@@ -20,6 +20,8 @@ export class AgGridComponent {
   defaultColDef: ColDef = {
     sortable: false, // ソート無効化（デフォルトだとソート機能がある）
     suppressMovable: true, // 列の移動を無効化（デフォルトだとドラッグで列を移動できてしまう）
+    wrapText: true, // テキストの折り返しを有効化（長いテキストが自動的に複数行になる。autoHeightとセットで使う。）
+    autoHeight: true, // 行の高さを自動調整（セル内容に応じて行の高さが変わる。wrapTextとセットで使う。）
     cellStyle: {
       userSelect: 'text', // テキスト選択を可能にし、コピー可能となる（デフォルトだと文字を選択できない）
     },
@@ -60,6 +62,6 @@ export class AgGridComponent {
     { id: 17, make: 'Volvo', model: 'S60', price: 45000, year: 2021, color: '白', mileage: 13000, fuelType: 'ハイブリッド', transmission: 'AT', status: '在庫あり' },
     { id: 18, make: 'Alfa Romeo', model: 'Giulia', price: 52000, year: 2020, color: '赤', mileage: 16000, fuelType: 'ガソリン', transmission: 'AT', status: '予約済' },
     { id: 19, make: 'Mini', model: 'Cooper', price: 35000, year: 2022, color: '青', mileage: 6000, fuelType: 'ガソリン', transmission: 'AT', status: '在庫あり' },
-    { id: 20, make: 'Hyundai', model: 'i30', price: 26000, year: 2021, color: '灰', mileage: 17000, fuelType: 'ガソリン', transmission: 'AT', status: '在庫あり' }
+    { id: 20, make: '長文あああああああああああああああああああああああああああああああああああああああああああああああああああああ', model: 'i30000000000000000000000000000000000000000000000000000000000000', price: 260000000000000000000000000000000, year: 2021000000000000000000000000000000000, color: '灰', mileage: 17000, fuelType: 'ガソリン', transmission: 'AT', status: '在庫ありaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
   ];
 }
