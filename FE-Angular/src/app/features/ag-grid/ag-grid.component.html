@@ -1,0 +1,46 @@
+<div class="main-title">AG-GRIDレッスン</div>
+
+<div class="main-subtitle">
+  <span class="main-subtitle-title">ag-grid works!</span>
+  <span>
+    <button mat-raised-button (click)="toggleColumnPanel()">列表示設定</button>
+  </span>
+</div>
+
+<!-- 列表示設定パネル -->
+@if (showColumnPanel) {
+<div class="column-panel">
+  <div class="column-panel-header">
+    <span>列の表示設定</span>
+    <div class="column-panel-actions">
+      <button mat-button (click)="selectAllColumns()">全選択</button>
+      <button mat-button (click)="deselectAllColumns()">全解除</button>
+      <button mat-icon-button (click)="toggleColumnPanel()">×</button>
+    </div>
+  </div>
+  <div class="column-panel-content">
+    @for (col of columnVisibilityList; track col.field) {
+    <div class="column-item">
+      <label>
+        <input
+          type="checkbox"
+          [checked]="col.visible"
+          (change)="toggleColumnVisibility(col.field)"
+        />
+        {{ col.headerName }}
+      </label>
+    </div>
+    }
+  </div>
+</div>
+}
+
+<div class="main-content">
+  <ag-grid-angular
+    style="width: 100%; height: 100%;"
+    [theme]="theme"
+    [rowData]="rowData"
+    [columnDefs]="colDefs"
+    [defaultColDef]="defaultColDef">
+  </ag-grid-angular>
+</div>

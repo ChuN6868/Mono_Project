@@ -53,6 +53,14 @@ export class SidebarComponent {
       children: [],
     },
     {
+      menuId: 'ag-grid',
+      iconId: 'grid_on', // 他テーブルとしておすすめなもの「table_chart」
+      menuName: 'AG-GRIDレッスン',
+      path: '/ag-grid',
+      expanded: false,
+      children: [],
+    },
+    {
       menuId: 'authority',
       iconId: 'security',
       menuName: 'guardレッスン',
