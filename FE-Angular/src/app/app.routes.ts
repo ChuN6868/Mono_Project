@@ -4,6 +4,7 @@ import { GuardLessonComponent } from './features/guard-lesson/guard-lesson.compo
 import { authGuard, authGuardChild, adminGuard } from './core/guards/auth.guard';
 import { AdminPageComponent } from './features/guard-lesson/pages/admin-page/admin-page.component';
 import { HomeComponent } from './features/home/home.component';
+import { PokeApiComponent } from './features/poke-api/poke-api.component';
 
 export const routes: Routes = [
   /************************
@@ -21,7 +22,7 @@ export const routes: Routes = [
    ************************/
   {
     path: 'guard-lesson',
-    canActivate: [authGuard],          // 親ルート自体に認証ガード
+    canActivate: [authGuard], // 親ルート自体に認証ガード
     canActivateChild: [authGuardChild], // すべての子ルートに認証ガード
     children: [
       /**
@@ -40,8 +41,13 @@ export const routes: Routes = [
       {
         path: 'admin-only',
         component: AdminPageComponent, // 実際には別のコンポーネントを指定
-        canActivate: [adminGuard],        // 管理者のみアクセス可能
+        canActivate: [adminGuard], // 管理者のみアクセス可能
       },
     ],
   },
+
+  /************************
+   * ポケモン用（認証不要）
+   ************************/
+  { path: 'pokemon', component: PokeApiComponent },
 ];

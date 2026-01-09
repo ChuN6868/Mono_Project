@@ -61,6 +61,14 @@ export class SidebarComponent {
       children: [],
     },
     {
+      menuId: 'pokemon',
+      iconId: 'catching_pokemon',
+      menuName: 'ポケモン',
+      path: '/pokemon',
+      expanded: false,
+      children: [],
+    },
+    {
       menuId: 'users',
       iconId: 'people',
       menuName: 'ユーザー管理',
