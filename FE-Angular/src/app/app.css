@@ -45,7 +45,7 @@
 .custom-footer {
   background-color: #424242;
   color: white;
-  padding: 16px;
   text-align: center;
   font-size: 12px;
+  height: 30px;
 }

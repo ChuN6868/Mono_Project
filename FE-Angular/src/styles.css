@@ -30,7 +30,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 /* サブタイトル部分のレイアウト */
-.sub-title {
+.main-subtitle {
   display: flex;
   justify-content: space-between;
   padding: 5px 0px;
@@ -38,6 +38,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.main-subtitle-title {
+  font-size: 20px;
+  padding-left: 10px;
 }
 
 /* メインコンテンツエリア */
