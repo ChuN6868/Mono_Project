@@ -1,5 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* ========================================
+   基本レイアウト
+   ======================================== */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ========================================
+   メインコンテンツレイアウト
+   ======================================== */
+
+/* ページタイトルレイアウト調整 */
 .main-title {
   background-color: #d9d9d9;
   display: inline-block;
@@ -16,6 +28,8 @@
   max-width: 100%;
   box-sizing: border-box;
 }
+
+/* サブタイトル部分のレイアウト */
 .sub-title {
   display: flex;
   justify-content: space-between;
@@ -25,5 +39,12 @@
   flex-wrap: wrap;
   gap: 10px;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* メインコンテンツエリア */
+.main-content {
+  border: 1px solid #333;
+  height: calc(100vh - 230px);
+  margin-top: 5px;
+  overflow: auto;
+}
+

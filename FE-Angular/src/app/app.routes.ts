@@ -4,6 +4,7 @@ import { GuardLessonComponent } from './features/guard-lesson/guard-lesson.compo
 import { authGuard, authGuardChild, adminGuard } from './core/guards/auth.guard';
 import { AdminPageComponent } from './features/guard-lesson/pages/admin-page/admin-page.component';
 import { HomeComponent } from './features/home/home.component';
+import { AgGridComponent } from './features/ag-grid/ag-grid.component';
 
 export const routes: Routes = [
   /************************
@@ -15,6 +16,11 @@ export const routes: Routes = [
    * CSVインポート用（認証不要）
    ************************/
   { path: 'csv-import', component: CsvImport },
+
+  /************************
+   * AG-GRID用（認証不要）
+   ************************/
+  { path: 'ag-grid', component: AgGridComponent },
 
   /************************
    * guard-lesson用（認証必須）

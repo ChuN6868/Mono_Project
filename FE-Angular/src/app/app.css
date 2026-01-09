@@ -32,8 +32,10 @@
  * - padding: 20px; でコンテンツの周囲に余白を設け、窮屈な印象を避ける
  * - background-color: #f5f5f5; で薄いグレーの背景を適用し、白い要素との対比を作る
  * - overflow: auto; でコンテンツが多い場合に縦スクロールを可能にする
+ * - flex: 1; でサイドバーを除く残りのスペース全てを使用
  */
 .custom-content {
+  flex: 1;
   padding: 10px;
   background-color: #f5f5f5;
   overflow: auto;
