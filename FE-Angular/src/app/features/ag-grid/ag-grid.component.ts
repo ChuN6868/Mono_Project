@@ -20,6 +20,9 @@ export class AgGridComponent {
   defaultColDef: ColDef = {
     sortable: false, // ソート無効化（デフォルトだとソート機能がある）
     suppressMovable: true, // 列の移動を無効化（デフォルトだとドラッグで列を移動できてしまう）
+    cellStyle: {
+      userSelect: 'text', // テキスト選択を可能にし、コピー可能となる（デフォルトだと文字を選択できない）
+    },
   };
 
   // 列定義
