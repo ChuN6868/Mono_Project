@@ -13,6 +13,9 @@ export class AgGridComponent {
   // テーマ設定（新しいTheming API）
   theme = themeQuartz;
 
+  // 列の移動を無効化（デフォルトだとドラッグで列を移動できてしまう）
+  suppressMovableColumns = true;
+
   // 列定義
   colDefs: ColDef[] = [
     { field: 'id', headerName: 'ID' },
