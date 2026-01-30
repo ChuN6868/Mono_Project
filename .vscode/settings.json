@@ -1,0 +1,18 @@
+{
+  "editor.formatOnSave": true, // 保存時にフォーマッターを実行するかどうか
+//   "editor.formatOnPaste": true,  // ペースト時も実行する場合はtrue
+//   "editor.formatOnType": true,    // 入力時も実行する場合はtrue（セミコロンや閉じ括弧を打った時など）
+  // 各言語ごとにフォーマッターを指定できる（設定しない場合はVSCODEがデフォルトで認識しているフォーマッターが使用される（Prettier拡張機能がインストールされていればPrettier、なければVSCODE内臓のフォーマッター））
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // 使用するフォーマッター拡張機能のID
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
