@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--browser", "msedge",
+        "--viewport-size", "1280,720"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "C:\\playwright-browsers",
+        "DEBUG": "pw:api",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "0",
+        "TZ": "Asia/Tokyo"
+      }
+    }
+  }
+}
