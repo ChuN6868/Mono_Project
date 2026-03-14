@@ -30,10 +30,14 @@ param location string = resourceGroup().location
 param appServicePlanName string
 // ↑ デフォルト値なし = bicepparam での指定が必須
 
-@description('Web App 名（グローバルで一意である必要あり）')
-param webAppName string
-// ↑ Web App の名前は Azure 全体で一意でなければならない
-//   （URL: https://<webAppName>.azurewebsites.net になるため）
+@description('Web App 名 - フロントエンド（グローバルで一意である必要あり）')
+param webAppNameFrontend string
+// ↑ FE用 Web App の名前は Azure 全体で一意でなければならない
+//   （URL: https://<webAppNameFrontend>.azurewebsites.net になるため）
+
+@description('Web App 名 - バックエンド（グローバルで一意である必要あり）')
+param webAppNameBackend string
+// ↑ BE用 Web App の名前も Azure 全体で一意でなければならない
 
 // ------------------------------------------------------------
 // モジュール呼び出し（module）
@@ -54,16 +58,26 @@ module appServicePlan 'modules/app-service-plan.bicep' = {
   }
 }
 
-// Web App を作成するモジュールを呼び出し
-module webApp 'modules/web-app.bicep' = {
-  name: 'webAppDeployment'
+// FE用 Web App を作成するモジュールを呼び出し
+module webAppFrontend 'modules/web-app.bicep' = {
+  name: 'webAppFrontendDeployment'
   params: {
     location: location
-    webAppName: webAppName
+    webAppName: webAppNameFrontend
     appServicePlanId: appServicePlan.outputs.appServicePlanId
     // ↑ 上の appServicePlan モジュールの output（作成結果）を参照。
     //   これにより「Web App → App Service Plan」の依存関係が自動解決され、
     //   App Service Plan が先に作成される。
+  }
+}
+
+// BE用 Web App を作成するモジュールを呼び出し
+module webAppBackend 'modules/web-app.bicep' = {
+  name: 'webAppBackendDeployment'
+  params: {
+    location: location
+    webAppName: webAppNameBackend
+    appServicePlanId: appServicePlan.outputs.appServicePlanId
   }
 }
 
@@ -73,6 +87,8 @@ module webApp 'modules/web-app.bicep' = {
 // デプロイ完了後にターミナルに表示される値。
 // 書式: output <名前> <型> = <値>
 
-output webAppUrl string = webApp.outputs.webAppUrl
-// ↑ デプロイ後、作成された Web App の URL が表示される
-//   例: https://app-bicep-lesson-dev.azurewebsites.net
+output webAppFrontendUrl string = webAppFrontend.outputs.webAppUrl
+// ↑ デプロイ後、FE用 Web App の URL が表示される
+
+output webAppBackendUrl string = webAppBackend.outputs.webAppUrl
+// ↑ デプロイ後、BE用 Web App の URL が表示される
