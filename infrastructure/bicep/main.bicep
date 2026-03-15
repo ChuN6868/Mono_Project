@@ -39,6 +39,15 @@ param webAppNameFrontend string
 param webAppNameBackend string
 // ↑ BE用 Web App の名前も Azure 全体で一意でなければならない
 
+@description('Google OAuth クライアントID')
+param googleClientId string = ''
+// ↑ Google Cloud Console で取得したクライアントID
+
+@secure()
+@description('Google OAuth クライアントシークレット')
+param googleClientSecret string = ''
+// ↑ Google認証のシークレットをデプロイ時にコマンドラインで渡す（コードに含めない）
+
 // ------------------------------------------------------------
 // モジュール呼び出し（module）
 // ------------------------------------------------------------
@@ -58,7 +67,7 @@ module appServicePlan 'modules/app-service-plan.bicep' = {
   }
 }
 
-// FE用 Web App を作成するモジュールを呼び出し
+// FE用 Web App を作成するモジュールを呼び出し（Google認証付き）
 module webAppFrontend 'modules/web-app.bicep' = {
   name: 'webAppFrontendDeployment'
   params: {
@@ -68,6 +77,9 @@ module webAppFrontend 'modules/web-app.bicep' = {
     // ↑ 上の appServicePlan モジュールの output（作成結果）を参照。
     //   これにより「Web App → App Service Plan」の依存関係が自動解決され、
     //   App Service Plan が先に作成される。
+    enableGoogleAuth: true // Google認証を有効にする
+    googleClientId: googleClientId // Google認証パラメータから渡す（誰のアプリか、を識別するだけなので設定ファイルに書き込んでよい）
+    googleClientSecret: googleClientSecret // Google認証パラメータから渡す（secure() でマスクされる。暗証番号のようなものなので設定ファイルに書き込まない）
   }
 }
 
