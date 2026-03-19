@@ -30,14 +30,21 @@ param location string = resourceGroup().location
 param appServicePlanName string
 // ↑ デフォルト値なし = bicepparam での指定が必須
 
-@description('Web App 名 - フロントエンド（グローバルで一意である必要あり）')
-param webAppNameFrontend string
-// ↑ FE用 Web App の名前は Azure 全体で一意でなければならない
-//   （URL: https://<webAppNameFrontend>.azurewebsites.net になるため）
+@description('Web App 名 - フロントエンド Google認証用（グローバルで一意である必要あり）')
+param webAppNameFrontendGoogle string
+// ↑ Google認証用 FE Web App の名前は Azure 全体で一意でなければならない
+
+@description('Web App 名 - フロントエンド Entra ID認証用（グローバルで一意である必要あり）')
+param webAppNameFrontendEntraId string
+// ↑ Entra ID認証用 FE Web App の名前は Azure 全体で一意でなければならない
 
 @description('Web App 名 - バックエンド（グローバルで一意である必要あり）')
 param webAppNameBackend string
 // ↑ BE用 Web App の名前も Azure 全体で一意でなければならない
+
+/* ========================================
+   Google認証関連
+   ======================================== */
 
 @description('Google OAuth クライアントID')
 param googleClientId string = ''
@@ -47,6 +54,23 @@ param googleClientId string = ''
 @description('Google OAuth クライアントシークレット')
 param googleClientSecret string = ''
 // ↑ Google認証のシークレットをデプロイ時にコマンドラインで渡す（コードに含めない）
+
+/* ========================================
+   Entra ID認証関連
+   ======================================== */
+
+@description('Entra ID アプリケーション（クライアント）ID')
+param entraIdClientId string = ''
+// ↑ Azure Portal のアプリの登録で取得したクライアントID
+
+@secure()
+@description('Entra ID クライアントシークレット')
+param entraIdClientSecret string = ''
+// ↑ Entra ID のシークレットをデプロイ時にコマンドラインで渡す（コードに含めない）
+
+@description('Entra ID テナントID')
+param entraIdTenantId string = ''
+// ↑ Azure Portal の Microsoft Entra ID の概要画面で確認できるテナントID
 
 // ------------------------------------------------------------
 // モジュール呼び出し（module）
@@ -67,19 +91,33 @@ module appServicePlan 'modules/app-service-plan.bicep' = {
   }
 }
 
-// FE用 Web App を作成するモジュールを呼び出し（Google認証付き）
-module webAppFrontend 'modules/web-app.bicep' = {
-  name: 'webAppFrontendDeployment'
+// FE用 Web App（Google認証）を作成するモジュールを呼び出し
+module webAppFrontendGoogle 'modules/web-app.bicep' = {
+  name: 'webAppFrontendGoogleDeployment'
   params: {
     location: location
-    webAppName: webAppNameFrontend
+    webAppName: webAppNameFrontendGoogle
     appServicePlanId: appServicePlan.outputs.appServicePlanId
     // ↑ 上の appServicePlan モジュールの output（作成結果）を参照。
     //   これにより「Web App → App Service Plan」の依存関係が自動解決され、
     //   App Service Plan が先に作成される。
-    enableGoogleAuth: true // Google認証を有効にする
-    googleClientId: googleClientId // Google認証パラメータから渡す（誰のアプリか、を識別するだけなので設定ファイルに書き込んでよい）
-    googleClientSecret: googleClientSecret // Google認証パラメータから渡す（secure() でマスクされる。暗証番号のようなものなので設定ファイルに書き込まない）
+    enableGoogleAuth: true // Google認証のみ有効
+    googleClientId: googleClientId
+    googleClientSecret: googleClientSecret
+  }
+}
+
+// FE用 Web App（Entra ID認証）を作成するモジュールを呼び出し
+module webAppFrontendEntraId 'modules/web-app.bicep' = {
+  name: 'webAppFrontendEntraIdDeployment'
+  params: {
+    location: location
+    webAppName: webAppNameFrontendEntraId
+    appServicePlanId: appServicePlan.outputs.appServicePlanId
+    enableEntraIdAuth: true // Entra ID認証のみ有効
+    entraIdClientId: entraIdClientId
+    entraIdClientSecret: entraIdClientSecret
+    entraIdTenantId: entraIdTenantId
   }
 }
 
@@ -99,8 +137,11 @@ module webAppBackend 'modules/web-app.bicep' = {
 // デプロイ完了後にターミナルに表示される値。
 // 書式: output <名前> <型> = <値>
 
-output webAppFrontendUrl string = webAppFrontend.outputs.webAppUrl
-// ↑ デプロイ後、FE用 Web App の URL が表示される
+output webAppFrontendGoogleUrl string = webAppFrontendGoogle.outputs.webAppUrl
+// ↑ デプロイ後、Google認証用 FE Web App の URL が表示される
+
+output webAppFrontendEntraIdUrl string = webAppFrontendEntraId.outputs.webAppUrl
+// ↑ デプロイ後、Entra ID認証用 FE Web App の URL が表示される
 
 output webAppBackendUrl string = webAppBackend.outputs.webAppUrl
 // ↑ デプロイ後、BE用 Web App の URL が表示される
