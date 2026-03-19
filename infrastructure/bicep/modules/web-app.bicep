@@ -53,7 +53,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   }
 }
 
-// Google認証設定（enableGoogleAuth が true の場合のみ作成）
+// 認証設定（enableGoogleAuth または enableEntraIdAuth が true の場合のみ作成）
 resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogleAuth || enableEntraIdAuth) {
   parent: webApp
   name: 'authsettingsV2'
@@ -61,7 +61,7 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
     globalValidation: {
       requireAuthentication: true
       unauthenticatedClientAction: 'RedirectToLoginPage'
-      // redirectToProvider: 'google' ←複数プロバイダーの場合は、redirectToProviderは指定しない
+      // ↑ 未認証ユーザーをログインページにリダイレクトする
     }
     identityProviders: {
       // Google認証（enableGoogleAuth が true の場合）
@@ -105,10 +105,10 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
 }
 
 /* ========================================
-   Google & Entra ID認証関連
+   認証用アプリ設定
    ======================================== */
 
-// クライアントシークレットをアプリ設定に格納
+// クライアントシークレットをアプリ設定に格納（認証プロバイダーが参照する）
 resource appSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogleAuth || enableEntraIdAuth) {
   parent: webApp
   name: 'appsettings'
