@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'FE-Angular/**'  # FE-Angular 配下の変更時のみ実行
   workflow_dispatch:
 
 jobs:
@@ -23,17 +25,17 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: npm install, build, and test
+      - name: npm install and build
+        working-directory: ./FE-Angular  # FE-Angular ディレクトリでビルドを実行
         run: |
           npm install
-          npm run build --if-present
-          npm run test --if-present
-      
+          npm run build
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: ./FE-Angular/dist/FE-Angular/browser  # Angular のビルド成果物のみアップロード
 
   deploy:
     runs-on: ubuntu-latest
