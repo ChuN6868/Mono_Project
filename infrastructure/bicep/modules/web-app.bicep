@@ -8,6 +8,22 @@ param webAppName string
 param appServicePlanId string
 
 /* ========================================
+   ランタイム設定関連
+   ======================================== */
+// Free(F1)プランは Windows のみ対応のため、linuxFxVersion ではなく
+// Windows 用のランタイム設定（appSettings / javaVersion 等）を使用する。
+// runtime パラメータで 'node' または 'java' を切り替える。
+
+@description('ランタイムの種類（node または java）')
+param runtime string = 'node' // デフォルト: Node.js
+
+@description('Node.js のバージョン（例: ~22, ~20）')
+param nodeVersion string = '~22' // デフォルト: Node.js 22
+
+@description('Java のバージョン（例: 17, 21）')
+param javaVersion string = '17' // デフォルト: Java 17
+
+/* ========================================
    Google認証関連
    ======================================== */
 
@@ -50,6 +66,28 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true
+    // ランタイムの種類に応じて siteConfig を切り替える（三項演算子）
+    // 'java' → Java SE ランタイムを設定
+    // 'node' → nodeVersion で Node.js バージョンを指定
+    siteConfig: runtime == 'java' ? {
+      javaVersion: javaVersion       // Java のバージョン（例: 17）
+      javaContainer: 'JAVA'          // コンテナの種類（Java SE の場合は 'JAVA'）
+      javaContainerVersion: 'SE'     // Java SE（組み込みサーバー = Spring Boot 等で使用）
+      metadata: [
+        {
+          name: 'CURRENT_STACK'      // ポータルの「スタック設定」に表示するための設定
+          value: 'java'
+        }
+      ]
+    } : {
+      nodeVersion: nodeVersion       // Node.js のバージョン（例: ~22）
+      metadata: [
+        {
+          name: 'CURRENT_STACK'      // ポータルの「スタック設定」に表示するための設定
+          value: 'node'
+        }
+      ]
+    }
   }
 }
 
@@ -108,12 +146,19 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
    認証用アプリ設定
    ======================================== */
 
-// クライアントシークレットをアプリ設定に格納（認証プロバイダーが参照する）
-resource appSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogleAuth || enableEntraIdAuth) {
+// アプリ設定（環境変数）を一括で管理する
+// ・認証用シークレット（認証プロバイダーが参照する）
+// ・WEBSITE_NODE_DEFAULT_VERSION（Node.js の場合のみ、ランタイムバージョンを指定）
+// ※ appsettings リソースは1つにまとめる必要がある（複数定義すると後勝ちで上書きされるため）
+resource appSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   parent: webApp
   name: 'appsettings'
   properties: union(
+    // Node.js の場合、WEBSITE_NODE_DEFAULT_VERSION を設定
+    runtime == 'node' ? { WEBSITE_NODE_DEFAULT_VERSION: nodeVersion } : {},
+    // Google認証が有効な場合、クライアントシークレットを設定
     enableGoogleAuth ? { GOOGLE_CLIENT_SECRET: googleClientSecret } : {},
+    // Entra ID認証が有効な場合、クライアントシークレットを設定
     enableEntraIdAuth ? { ENTRA_ID_CLIENT_SECRET: entraIdClientSecret } : {}
   )
 }

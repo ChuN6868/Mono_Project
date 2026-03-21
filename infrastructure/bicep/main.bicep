@@ -128,6 +128,7 @@ module webAppBackend 'modules/web-app.bicep' = {
     location: location
     webAppName: webAppNameBackend
     appServicePlanId: appServicePlan.outputs.appServicePlanId
+    runtime: 'java' // BE は Spring Boot のため Java ランタイムを指定（デフォルトの node を上書き）
   }
 }
 
