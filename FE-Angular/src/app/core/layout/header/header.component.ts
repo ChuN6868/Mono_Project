@@ -2,13 +2,14 @@ import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatToolbarModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatMenuModule, MatToolbarModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
@@ -31,5 +32,15 @@ export class HeaderComponent implements OnInit {
   /** メニューボタンがクリックされたとき */
   public onMenuClick(): void {
     this.menuClick.emit(); // 親にイベントを通知するだけ
+  }
+
+  /**
+   * ログアウト処理
+   * App Service の EasyAuth が提供する /.auth/logout エンドポイントにリダイレクトする。
+   * App Service 側で認証セッション（トークンCookie）が破棄され、
+   * その後プロバイダー（Google / Entra ID）のログアウト処理も実行される。
+   */
+  public onLogout(): void {
+    window.location.href = '/.auth/logout';
   }
 }
