@@ -136,4 +136,21 @@ export class AuthService {
   isLoggedIn(): boolean {
     return this.currentUser$.value !== null;
   }
+
+  /**
+   * 管理者かどうかを返す。
+   * Entra ID のアプリロールで 'admin' が設定されている場合に true。
+   * ダミーユーザーの場合も role が 'admin' なら true。
+   */
+  isAdmin(): boolean {
+    return this.currentUser$.value?.role === 'admin';
+  }
+
+  /**
+   * 最高管理者かどうかを返す。
+   * Entra ID のアプリロールで 'superadmin' が設定されている場合に true。
+   */
+  isSuperAdmin(): boolean {
+    return this.currentUser$.value?.role === 'superadmin';
+  }
 }
