@@ -58,7 +58,14 @@ export class AuthService {
    * App Service の /.auth/me を呼び出してユーザー情報を取得する。
    *
    * - 成功時: レスポンスを解析して User オブジェクトを生成
-   * - 失敗時: ローカル開発環境と判断し、ダミーユーザーにフォールバック
+   * - 失敗時:
+   *   - ローカル開発環境（localhost）: ダミーユーザーにフォールバック
+   *   - デプロイ環境: /.auth/login/aad にリダイレクト（再認証を促す）
+   *
+   * 【経緯】ログアウト後に再アクセスすると、ブラウザキャッシュから Angular アプリが
+   *   表示され、/.auth/me が失敗してダミーユーザー「山田太郎」が表示される問題があった。
+   *   デプロイ環境では EasyAuth のログインページにリダイレクトすることで、
+   *   未認証状態でアプリが表示されることを防ぐ。
    *
    * ※ このメソッドはアプリ起動時に1回だけ呼び出す想定
    */
@@ -70,16 +77,39 @@ export class AuthService {
           const user = this.parseAuthMeResponse(res[0]);
           this.currentUser$.next(user);
         } else {
-          this.currentUser$.next(this.DUMMY_USER);
+          this.handleAuthFailure();
         }
       },
       error: () => {
-        // ローカル開発時は /.auth/me が存在しないため 404 エラーになる
-        // → ダミーユーザーを返してアプリが正常に動作するようにする
-        this.currentUser$.next(this.DUMMY_USER);
+        this.handleAuthFailure();
       },
     });
     return this.currentUser$.asObservable();
+  }
+
+  /**
+   * /.auth/me が失敗した場合の処理。
+   * - ローカル開発環境（localhost）: ダミーユーザーにフォールバック
+   * - デプロイ環境: EasyAuth のログインエンドポイントにリダイレクトして再認証を促す
+   */
+  private handleAuthFailure(): void {
+    if (this.isLocalDevelopment()) {
+      // ローカル開発時は /.auth/me が存在しないため 404 エラーになる
+      // → ダミーユーザーを返してアプリが正常に動作するようにする
+      this.currentUser$.next(this.DUMMY_USER);
+    } else {
+      // デプロイ環境: 未認証状態なのでログインページにリダイレクト
+      window.location.href = '/.auth/login/aad';
+    }
+  }
+
+  /**
+   * ローカル開発環境かどうかを判定する。
+   * localhost または 127.0.0.1 で動作している場合にローカルと判定。
+   */
+  private isLocalDevelopment(): boolean {
+    const hostname = window.location.hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1';
   }
 
   /**

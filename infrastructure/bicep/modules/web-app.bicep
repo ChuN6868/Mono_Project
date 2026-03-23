@@ -96,10 +96,27 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
   parent: webApp
   name: 'authsettingsV2'
   properties: {
+    // 【経緯】Entra ID認証でログアウト後に再アクセスすると、ログイン画面を経由せず
+    //   自動サインインしてしまう問題が発生した。
+    //   別プロジェクトの EasyAuth 設定と比較した結果、
+    //   platform / httpSettings / login.routes 等の設定が不足していることが判明。
+    //   以下を追加し、EasyAuth のセッション管理を正しく機能させる。
+    platform: {
+      enabled: true // EasyAuth プラットフォーム機能を有効化
+    }
     globalValidation: {
       requireAuthentication: true
       unauthenticatedClientAction: 'RedirectToLoginPage'
       // ↑ 未認証ユーザーをログインページにリダイレクトする
+    }
+    httpSettings: {
+      requireHttps: true // HTTPS通信を強制
+      routes: {
+        apiPrefix: '/.auth' // EasyAuth APIのプレフィックス（Azure標準）
+      }
+      forwardProxy: {
+        convention: 'Standard' // 標準プロキシヘッダー（X-Forwarded-*）を使用
+      }
     }
     identityProviders: {
       // Google認証（enableGoogleAuth が true の場合）
@@ -121,6 +138,14 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
       azureActiveDirectory: enableEntraIdAuth
         ? {
             enabled: true
+            // login 設定:
+            //   loginParameters で openid スコープを明示的に要求する。
+            login: {
+              loginParameters: [
+                'scope=openid profile email'
+              ]
+              disableWWWAuthenticate: false
+            }
             registration: {
               openIdIssuer: '${environment().authentication.loginEndpoint}${entraIdTenantId}/v2.0'
               clientId: entraIdClientId
@@ -137,6 +162,9 @@ resource authSettings 'Microsoft.Web/sites/config@2023-12-01' = if (enableGoogle
     login: {
       tokenStore: {
         enabled: true
+      }
+      routes: {
+        logoutEndpoint: '/.auth/logout' // ログアウトエンドポイントを明示的に指定
       }
     }
   }
