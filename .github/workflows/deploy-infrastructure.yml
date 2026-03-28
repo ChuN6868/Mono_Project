@@ -1,0 +1,89 @@
+# ============================================================
+# deploy-infrastructure.yml
+# Bicep インフラストラクチャのデプロイ用ワークフロー
+# ============================================================
+# このワークフローの役割:
+#   - GitHub Actions から Azure にログインし、
+#     Bicep テンプレートを使ってインフラリソースをデプロイする
+#   - シークレット（Google / Entra ID のクライアントシークレット等）は
+#     GitHub Secrets から取得するため、手動入力が不要
+#
+# 事前準備（GitHub リポジトリの Settings > Secrets and variables > Actions > Secrets に登録）:
+#   - AZURE_CREDENTIALS       : サービスプリンシパルの認証情報（JSON形式）
+#                                az ad sp create-for-rbac --sdk-auth で生成
+#   - AZURE_SUBSCRIPTION      : Azure サブスクリプション ID
+#   - AZURE_RG                : デプロイ先のリソースグループ名
+#   - GOOGLE_CLIENT_SECRET    : Google OAuth クライアントシークレット
+#   - ENTRA_ID_CLIENT_SECRET  : Entra ID クライアントシークレット
+#
+# 実行方法:
+#   GitHub 上で Actions > Deploy Infrastructure (Bicep) > Run workflow
+# ============================================================
+
+name: Deploy Infrastructure (Bicep)
+
+# ------------------------------------------------------------
+# トリガー設定
+# ------------------------------------------------------------
+# workflow_dispatch = GitHub の Actions タブから手動実行するトリガー。
+# push トリガーは設定していないため、コードを push しても自動実行されない。
+on:
+  workflow_dispatch:  # 手動実行のみ
+
+# ------------------------------------------------------------
+# ジョブ定義
+# ------------------------------------------------------------
+jobs:
+  deploy-infrastructure:
+    runs-on: ubuntu-latest  # Ubuntu の最新バージョンで実行
+
+    permissions:
+      contents: read  # リポジトリのソースコードを読み取るために必要
+
+    steps:
+      # ----------------------------------------
+      # Step 1: ソースコードのチェックアウト
+      # ----------------------------------------
+      # リポジトリのコードを runner にクローンする。
+      # これにより後続ステップで Bicep ファイルを参照できる。
+      - uses: actions/checkout@v4
+
+      # ----------------------------------------
+      # Step 2: Azure へのログイン
+      # ----------------------------------------
+      # GitHub Secrets に登録したサービスプリンシパルの認証情報を使って
+      # Azure CLI にログインする。
+      # これ以降のステップで az コマンドや ARM デプロイが実行可能になる。
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # ↑ JSON形式のサービスプリンシパル情報
+          #   { "clientId": "...", "clientSecret": "...",
+          #     "subscriptionId": "...", "tenantId": "..." }
+
+      # ----------------------------------------
+      # Step 3: Bicep テンプレートのデプロイ
+      # ----------------------------------------
+      # azure/arm-deploy アクションを使って、Bicep テンプレートを
+      # 指定のリソースグループにデプロイする。
+      #
+      # parameters の仕組み:
+      #   1. まず dev.bicepparam ファイルから基本パラメータを読み込む
+      #      （App名、クライアントID、テナントID など）
+      #   2. 続けてシークレット値を上書き指定する
+      #      （bicepparam に書けない機密情報を GitHub Secrets から注入）
+      - name: Deploy Bicep
+        uses: azure/arm-deploy@v2
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}    # デプロイ先のサブスクリプション
+          resourceGroupName: ${{ secrets.AZURE_RG }}            # デプロイ先のリソースグループ
+          template: ./infrastructure/bicep/main.bicep           # Bicep テンプレートのパス
+          parameters: >
+            ./infrastructure/bicep/environments/dev.bicepparam
+            googleClientSecret=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            entraIdClientSecret=${{ secrets.ENTRA_ID_CLIENT_SECRET }}
+          # ↑ dev.bicepparam の値 + シークレットを合わせて main.bicep の param に渡す
+          #   - googleClientSecret : Google OAuth のシークレット（@secure() パラメータ）
+          #   - entraIdClientSecret: Entra ID のシークレット（@secure() パラメータ）
+          failOnStdErr: false  # stderr への出力があってもエラーとしない（Azure CLI の警告対策）
