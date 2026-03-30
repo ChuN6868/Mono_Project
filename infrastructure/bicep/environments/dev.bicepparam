@@ -35,10 +35,17 @@ param entraIdTenantId = 'c1eb5b8f-ee65-465b-a28d-fbc750837850'
    ======================================== */
 
 // Log Analytics ワークスペース名（リソースグループ内で一意）
-param logAnalyticsName = 'log-bicep-lesson-dev-hogehoge'
+param logAnalyticsName = 'logAna-bicep-dev'
 
 // 選択肢: 30〜730（日数）。30日までは無料。31日以降は $0.10/GB/月。
 param logAnalyticsRetentionInDays = 30
 
 // 選択肢: 'PerGB2018'（従量課金制。5GB/月まで無料） / 'CapacityReservation'（日100GB以上の大規模向け予約割引）
 param logAnalyticsSkuName = 'PerGB2018'
+
+/* ========================================
+    Application Insights のパラメーター
+   ======================================== */
+
+// Application Insights 名（リソースグループ内で一意）
+param appInsightsName = 'applicationInsights-bicep-dev'

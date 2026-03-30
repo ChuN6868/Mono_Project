@@ -42,6 +42,10 @@ param logAnalyticsRetentionInDays int
 param logAnalyticsSkuName string
 // ↑ 通常は PerGB2018（従量課金制）を指定。大規模環境では CapacityReservation も選択可能。
 
+@description('Application Insights 名')
+param appInsightsName string
+// ↑ Application Insights の名前
+
 @description('Web App 名 - フロントエンド Google認証用（グローバルで一意である必要あり）')
 param webAppNameFrontendGoogle string
 // ↑ Google認証用 FE Web App の名前は Azure 全体で一意でなければならない
@@ -105,6 +109,18 @@ module logAnalytics 'modules/log-analytics.bicep' = {
   }
 }
 
+// Application Insights を作成するモジュールを呼び出し
+module appInsights 'modules/app-insights.bicep' = {
+  name: 'appInsightsDeployment'
+  params: {
+    location: location
+    appInsightsName: appInsightsName
+    logAnalyticsId: logAnalytics.outputs.logAnalyticsId
+    // ↑ Log Analytics モジュールの output を参照。
+    //   これにより Log Analytics → Application Insights の依存関係が自動解決される。
+  }
+}
+
 // App Service Plan を作成するモジュールを呼び出し
 module appServicePlan 'modules/app-service-plan.bicep' = {
   name: 'appServicePlanDeployment'
@@ -127,6 +143,8 @@ module webAppFrontendGoogle 'modules/web-app.bicep' = {
     enableGoogleAuth: true // Google認証のみ有効
     googleClientId: googleClientId
     googleClientSecret: googleClientSecret
+    appInsightsConnectionString: appInsights.outputs.connectionString
+    // ↑ Application Insights の接続文字列を渡す。Web App が自動的にデータを送信する。
   }
 }
 
@@ -141,6 +159,7 @@ module webAppFrontendEntraId 'modules/web-app.bicep' = {
     entraIdClientId: entraIdClientId
     entraIdClientSecret: entraIdClientSecret
     entraIdTenantId: entraIdTenantId
+    appInsightsConnectionString: appInsights.outputs.connectionString
   }
 }
 
@@ -152,6 +171,7 @@ module webAppBackend 'modules/web-app.bicep' = {
     webAppName: webAppNameBackend
     appServicePlanId: appServicePlan.outputs.appServicePlanId
     runtime: 'java' // BE は Spring Boot のため Java ランタイムを指定（デフォルトの node を上書き）
+    appInsightsConnectionString: appInsights.outputs.connectionString
   }
 }
 

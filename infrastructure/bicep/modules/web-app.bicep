@@ -57,6 +57,15 @@ param entraIdClientSecret string = ''
 param entraIdTenantId string = ''
 
 /* ========================================
+   Application Insights 関連
+   ======================================== */
+
+@description('Application Insights の接続文字列')
+param appInsightsConnectionString string = ''
+// ↑ main.bicep から Application Insights モジュールの output を経由して渡される。
+//   Web App はこの接続文字列を使って Application Insights にデータを自動送信する。
+
+/* ========================================
     Web App リソース
    ======================================== */
 
@@ -159,7 +168,13 @@ resource appSettings 'Microsoft.Web/sites/config@2023-12-01' = {
     // Google認証が有効な場合、クライアントシークレットを設定
     enableGoogleAuth ? { GOOGLE_CLIENT_SECRET: googleClientSecret } : {},
     // Entra ID認証が有効な場合、クライアントシークレットを設定
-    enableEntraIdAuth ? { ENTRA_ID_CLIENT_SECRET: entraIdClientSecret } : {}
+    enableEntraIdAuth ? { ENTRA_ID_CLIENT_SECRET: entraIdClientSecret } : {},
+    // Application Insights の接続文字列とエージェント設定（空でなければ設定）
+    // ApplicationInsightsAgent_EXTENSION_VERSION を設定しないと Azure Portal 上で紐づきが表示されない
+    !empty(appInsightsConnectionString) ? {
+      APPLICATIONINSIGHTS_CONNECTION_STRING: appInsightsConnectionString
+      ApplicationInsightsAgent_EXTENSION_VERSION: '~3'
+    } : {}
   )
 }
 
