@@ -30,6 +30,18 @@ param location string = resourceGroup().location
 param appServicePlanName string
 // ↑ デフォルト値なし = bicepparam での指定が必須
 
+@description('Log Analytics ワークスペース名')
+param logAnalyticsName string
+// ↑ ログの保管場所の名前
+
+@description('Log Analytics データ保持期間（日数）。30日までは無料。最大730日。')
+param logAnalyticsRetentionInDays int
+// ↑ ログの保持期間。環境ごとに bicepparam で指定する。
+
+@description('Log Analytics SKU（価格プラン）。PerGB2018 = 従量課金制。')
+param logAnalyticsSkuName string
+// ↑ 通常は PerGB2018（従量課金制）を指定。大規模環境では CapacityReservation も選択可能。
+
 @description('Web App 名 - フロントエンド Google認証用（グローバルで一意である必要あり）')
 param webAppNameFrontendGoogle string
 // ↑ Google認証用 FE Web App の名前は Azure 全体で一意でなければならない
@@ -81,6 +93,17 @@ param entraIdTenantId string = ''
 //     name: '<デプロイ名>'    ← Azure上で表示されるデプロイ名
 //     params: { ... }        ← モジュール側の param に渡す値
 //   }
+
+// Log Analytics ワークスペースを作成するモジュールを呼び出し
+module logAnalytics 'modules/log-analytics.bicep' = {
+  name: 'logAnalyticsDeployment'
+  params: {
+    location: location
+    logAnalyticsName: logAnalyticsName
+    retentionInDays: logAnalyticsRetentionInDays
+    skuName: logAnalyticsSkuName
+  }
+}
 
 // App Service Plan を作成するモジュールを呼び出し
 module appServicePlan 'modules/app-service-plan.bicep' = {
