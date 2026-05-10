@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AdBanner } from '@/src/features/ads';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -22,6 +23,7 @@ export default function HomeLayout() {
             style={{ flex: 1, backgroundColor: '#fff' }} // 余白部分のカラーを白に設定
             edges={['top']} // タブナビゲーションの上部にスペースを確保するために 'top' を指定（top, bottomから選択）
         >
+            <AdBanner />
             <MaterialTopTabs
                 screenOptions={{
                     tabBarLabelStyle: {
