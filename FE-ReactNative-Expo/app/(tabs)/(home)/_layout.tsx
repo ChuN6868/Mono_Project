@@ -48,14 +48,10 @@ export default function HomeLayout() {
         setIsCalendarOpen(false);
     };
 
-    // ★表示フォーマット変換（YYYY-MM-DD → 日本語）
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
         const d = new Date(dateStr);
-        const y = d.getFullYear();
-        const m = d.getMonth() + 1;
-        const day = d.getDate();
-        return `${y}年${m}月${day}日`;
+        return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
     };
 
     return (
@@ -73,15 +69,13 @@ export default function HomeLayout() {
                 <Ionicons name="add" size={24} color="#fff" />
             </Pressable>
 
-            {/* =========================
-                モーダル
-            ========================= */}
+            {/* モーダル */}
             <Modal
                 isVisible={isSheetOpen}
                 onBackdropPress={closeSheet}
                 swipeDirection="down"
                 onSwipeComplete={closeSheet}
-                propagateSwipe={true}
+                propagateSwipe
                 style={styles.modal}
                 backdropOpacity={0.4}
                 useNativeDriver
@@ -142,10 +136,14 @@ export default function HomeLayout() {
                         />
 
                         {/* =========================
-                            期限（改善UI）
+                            期限（アイコン付き）
                         ========================= */}
                         <View style={styles.dateRow}>
-                            <Text style={styles.label}>期限</Text>
+
+                            <View style={styles.dateLabelWrap}>
+                                <Ionicons name="calendar-outline" size={18} color="#333" />
+                                <Text style={styles.label}>期限</Text>
+                            </View>
 
                             <TouchableOpacity
                                 style={styles.dateInput}
@@ -157,7 +155,7 @@ export default function HomeLayout() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* カレンダー（モーダル） */}
+                        {/* カレンダー */}
                         {isCalendarOpen && (
                             <View style={styles.calendarBox}>
                                 <Calendar
@@ -193,10 +191,7 @@ export default function HomeLayout() {
    styles
 ========================= */
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
+    container: { flex: 1, backgroundColor: '#fff' },
 
     fab: {
         position: 'absolute',
@@ -230,38 +225,32 @@ const styles = StyleSheet.create({
         padding: 16,
     },
 
-    scrollArea: {
-        flex: 1,
-    },
+    scrollArea: { flex: 1 },
 
-    scrollContent: {
-        padding: 16,
-    },
+    scrollContent: { padding: 16 },
 
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 12,
-    },
-
-    /* ★今回の改善ポイント */
+    /* ===== 期限UI改善 ===== */
     dateRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
         justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+
+    dateLabelWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
 
     label: {
         fontSize: 14,
-        color: '#333',
         fontWeight: '600',
+        color: '#333',
     },
 
     dateInput: {
-        width: 140,            // ★小さくした
+        width: 140,
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderWidth: 1,
@@ -284,6 +273,15 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#eee',
+    },
+
+    /* その他 */
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 12,
     },
 
     segment: {
