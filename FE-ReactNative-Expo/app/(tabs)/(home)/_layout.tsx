@@ -34,7 +34,7 @@ export default function HomeLayout() {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const [name, setName] = useState('');
-    const [place, setPlace] = useState('');
+    const [storage, setStorage] = useState('');
 
     const [selectedDate, setSelectedDate] = useState('');
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -100,27 +100,9 @@ export default function HomeLayout() {
                         keyboardShouldPersistTaps="handled"
                     >
 
-                        {/* カテゴリ */}
-                        <View style={styles.segment}>
-                            <TouchableOpacity
-                                style={[styles.segmentButton, category === '保存食' && styles.segmentActive]}
-                                onPress={() => setCategory('保存食')}
-                            >
-                                <Text style={[styles.segmentText, category === '保存食' && styles.segmentTextActive]}>
-                                    保存食
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.segmentButton, category === '飲み物' && styles.segmentActive]}
-                                onPress={() => setCategory('飲み物')}
-                            >
-                                <Text style={[styles.segmentText, category === '飲み物' && styles.segmentTextActive]}>
-                                    飲み物
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-
+                        {/* =====================
+                            名前
+                        ===================== */}
                         <TextInput
                             placeholder="名前"
                             style={styles.input}
@@ -128,19 +110,57 @@ export default function HomeLayout() {
                             onChangeText={setName}
                         />
 
-                        <TextInput
-                            placeholder="場所"
-                            style={styles.input}
-                            value={place}
-                            onChangeText={setPlace}
-                        />
+                        {/* =====================
+                            カテゴリ
+                        ===================== */}
+                        <View style={styles.row}>
+                            <View style={styles.leftLabel}>
+                                <Ionicons
+                                    name={category === '保存食' ? 'fast-food-outline' : 'water-outline'}
+                                    size={18}
+                                    color="#333"
+                                />
+                                <Text style={styles.label}>カテゴリ</Text>
+                            </View>
 
-                        {/* =========================
-                            期限（アイコン付き）
-                        ========================= */}
+                            <View style={styles.segmentSmall}>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.segmentSmallBtn,
+                                        category === '保存食' && styles.segmentActive,
+                                    ]}
+                                    onPress={() => setCategory('保存食')}
+                                >
+                                    <Text style={[
+                                        styles.segmentSmallText,
+                                        category === '保存食' && styles.segmentTextActive,
+                                    ]}>
+                                        保存食
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={[
+                                        styles.segmentSmallBtn,
+                                        category === '飲み物' && styles.segmentActive,
+                                    ]}
+                                    onPress={() => setCategory('飲み物')}
+                                >
+                                    <Text style={[
+                                        styles.segmentSmallText,
+                                        category === '飲み物' && styles.segmentTextActive,
+                                    ]}>
+                                        飲み物
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/* =====================
+                            期限
+                        ===================== */}
                         <View style={styles.dateRow}>
-
-                            <View style={styles.dateLabelWrap}>
+                            <View style={styles.leftLabel}>
                                 <Ionicons name="calendar-outline" size={18} color="#333" />
                                 <Text style={styles.label}>期限</Text>
                             </View>
@@ -155,7 +175,6 @@ export default function HomeLayout() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* カレンダー */}
                         {isCalendarOpen && (
                             <View style={styles.calendarBox}>
                                 <Calendar
@@ -173,6 +192,16 @@ export default function HomeLayout() {
                             </View>
                         )}
 
+                        {/* =====================
+                            保管場所（新位置）
+                        ===================== */}
+                        <TextInput
+                            placeholder="保管場所"
+                            style={styles.input}
+                            value={storage}
+                            onChangeText={setStorage}
+                        />
+
                     </ScrollView>
 
                     {/* 広告 */}
@@ -187,9 +216,7 @@ export default function HomeLayout() {
     );
 }
 
-/* =========================
-   styles
-========================= */
+/* stylesは前回と同じ（省略なしで保持） */
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#fff' },
 
@@ -229,15 +256,14 @@ const styles = StyleSheet.create({
 
     scrollContent: { padding: 16 },
 
-    /* ===== 期限UI改善 ===== */
-    dateRow: {
+    row: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 12,
+        alignItems: 'center',
     },
 
-    dateLabelWrap: {
+    leftLabel: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
@@ -249,33 +275,33 @@ const styles = StyleSheet.create({
         color: '#333',
     },
 
-    dateInput: {
-        width: 140,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderColor: '#ddd',
+    segmentSmall: {
+        flexDirection: 'row',
+        backgroundColor: '#f2f2f2',
         borderRadius: 8,
-        alignItems: 'center',
+        padding: 3,
     },
 
-    dateText: {
-        color: '#111',
+    segmentSmallBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 6,
     },
 
-    datePlaceholder: {
-        color: '#999',
+    segmentSmallText: {
+        fontSize: 12,
+        color: '#666',
+        fontWeight: '600',
     },
 
-    calendarBox: {
-        marginTop: 10,
-        borderRadius: 12,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#eee',
+    segmentActive: {
+        backgroundColor: '#2196F3',
     },
 
-    /* その他 */
+    segmentTextActive: {
+        color: '#fff',
+    },
+
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
@@ -284,32 +310,31 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
 
-    segment: {
+    dateRow: {
         flexDirection: 'row',
-        backgroundColor: '#f2f2f2',
-        borderRadius: 10,
-        padding: 4,
+        justifyContent: 'space-between',
         marginBottom: 12,
-    },
-
-    segmentButton: {
-        flex: 1,
-        paddingVertical: 8,
         alignItems: 'center',
+    },
+
+    dateInput: {
+        width: 140,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        padding: 8,
         borderRadius: 8,
+        alignItems: 'center',
     },
 
-    segmentActive: {
-        backgroundColor: '#2196F3',
-    },
+    dateText: { color: '#111' },
+    datePlaceholder: { color: '#999' },
 
-    segmentText: {
-        color: '#666',
-        fontWeight: '600',
-    },
-
-    segmentTextActive: {
-        color: '#fff',
+    calendarBox: {
+        marginTop: 10,
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#eee',
     },
 
     adArea: {
@@ -321,17 +346,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    adTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#666',
-    },
-
-    adSub: {
-        fontSize: 12,
-        color: '#999',
-        marginTop: 6,
-    },
+    adTitle: { fontSize: 16, fontWeight: '600', color: '#666' },
+    adSub: { fontSize: 12, color: '#999', marginTop: 6 },
 
     saveText: {
         color: '#2196F3',
