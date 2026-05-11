@@ -14,8 +14,9 @@ import {
     TextInput,
     Text,
     TouchableOpacity,
+    ScrollView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // ←ここ修正済み
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import Modal from 'react-native-modal';
 import { Calendar } from 'react-native-calendars';
@@ -40,9 +41,7 @@ export default function HomeLayout() {
 
     const [category, setCategory] = useState<'保存食' | '飲み物'>('保存食');
 
-    const handleAddPress = () => {
-        setIsSheetOpen(true);
-    };
+    const handleAddPress = () => setIsSheetOpen(true);
 
     const closeSheet = () => {
         setIsSheetOpen(false);
@@ -64,70 +63,55 @@ export default function HomeLayout() {
                 <Ionicons name="add" size={24} color="#fff" />
             </Pressable>
 
-            {/* =========================
-                モーダル
-            ========================= */}
+            {/* モーダル */}
             <Modal
                 isVisible={isSheetOpen}
-                onSwipeComplete={closeSheet}
                 onBackdropPress={closeSheet}
                 swipeDirection="down"
+                onSwipeComplete={closeSheet}
+                propagateSwipe={true}
                 style={styles.modal}
                 backdropOpacity={0.4}
                 useNativeDriver
-                useNativeDriverForBackdrop
                 hideModalContentWhileAnimating
             >
                 <View style={styles.sheet}>
 
-                    {/* =========================
-                        上半分：入力
-                    ========================= */}
-                    <View style={styles.formArea}>
+                    {/* ヘッダー */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={closeSheet}>
+                            <Ionicons name="close" size={24} color="#333" />
+                        </TouchableOpacity>
 
-                        {/* ヘッダー */}
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={closeSheet}>
-                                <Ionicons name="close" size={24} color="#333" />
-                            </TouchableOpacity>
+                        <TouchableOpacity onPress={closeSheet}>
+                            <Text style={styles.saveText}>保存</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                            <TouchableOpacity onPress={closeSheet}>
-                                <Text style={styles.saveText}>保存</Text>
-                            </TouchableOpacity>
-                        </View>
+                    {/* フォーム */}
+                    <ScrollView
+                        style={styles.scrollArea}
+                        contentContainerStyle={styles.scrollContent}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
 
-                        {/* セグメント */}
+                        {/* カテゴリ */}
                         <View style={styles.segment}>
                             <TouchableOpacity
-                                style={[
-                                    styles.segmentButton,
-                                    category === '保存食' && styles.segmentActive,
-                                ]}
+                                style={[styles.segmentButton, category === '保存食' && styles.segmentActive]}
                                 onPress={() => setCategory('保存食')}
                             >
-                                <Text
-                                    style={[
-                                        styles.segmentText,
-                                        category === '保存食' && styles.segmentTextActive,
-                                    ]}
-                                >
+                                <Text style={[styles.segmentText, category === '保存食' && styles.segmentTextActive]}>
                                     保存食
                                 </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                                style={[
-                                    styles.segmentButton,
-                                    category === '飲み物' && styles.segmentActive,
-                                ]}
+                                style={[styles.segmentButton, category === '飲み物' && styles.segmentActive]}
                                 onPress={() => setCategory('飲み物')}
                             >
-                                <Text
-                                    style={[
-                                        styles.segmentText,
-                                        category === '飲み物' && styles.segmentTextActive,
-                                    ]}
-                                >
+                                <Text style={[styles.segmentText, category === '飲み物' && styles.segmentTextActive]}>
                                     飲み物
                                 </Text>
                             </TouchableOpacity>
@@ -147,15 +131,35 @@ export default function HomeLayout() {
                             onChangeText={setPlace}
                         />
 
-                        <TouchableOpacity style={styles.dateBox}>
-                            <Text>{selectedDate || 'タップして日付選択'}</Text>
+                        <TouchableOpacity
+                            style={styles.dateBox}
+                            onPress={() => setIsCalendarOpen(true)}
+                        >
+                            <Text style={selectedDate ? styles.dateText : styles.datePlaceholder}>
+                                {selectedDate || 'タップして日付選択'}
+                            </Text>
                         </TouchableOpacity>
 
-                    </View>
+                        {isCalendarOpen && (
+                            <View style={styles.calendarBox}>
+                                <Calendar
+                                    onDayPress={(day) => {
+                                        setSelectedDate(day.dateString);
+                                        setIsCalendarOpen(false);
+                                    }}
+                                    markedDates={{
+                                        [selectedDate]: {
+                                            selected: true,
+                                            selectedColor: '#2196F3',
+                                        },
+                                    }}
+                                />
+                            </View>
+                        )}
 
-                    {/* =========================
-                        下半分：広告
-                    ========================= */}
+                    </ScrollView>
+
+                    {/* 広告 */}
                     <View style={styles.adArea}>
                         <Text style={styles.adTitle}>広告スペース</Text>
                         <Text style={styles.adSub}>（ここにAdMobなど）</Text>
@@ -167,6 +171,9 @@ export default function HomeLayout() {
     );
 }
 
+/* =========================
+   styles（←ここに追加）
+========================= */
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -199,13 +206,24 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
 
-    formArea: {
-        flex: 1,
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         padding: 16,
+        paddingBottom: 8,
+    },
+
+    scrollArea: {
+        flex: 1,
+    },
+
+    scrollContent: {
+        padding: 16,
+        paddingBottom: 40,
     },
 
     adArea: {
-        flex: 1,
+        height: 180,
         backgroundColor: '#f2f2f2',
         borderTopWidth: 1,
         borderColor: '#ddd',
@@ -225,17 +243,6 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
 
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 12,
-    },
-
-    saveText: {
-        color: '#2196F3',
-        fontWeight: 'bold',
-    },
-
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
@@ -249,6 +256,15 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         padding: 12,
         borderRadius: 8,
+        marginBottom: 12,
+    },
+
+    dateText: {
+        color: '#111',
+    },
+
+    datePlaceholder: {
+        color: '#999',
     },
 
     segment: {
@@ -277,5 +293,19 @@ const styles = StyleSheet.create({
 
     segmentTextActive: {
         color: '#fff',
+    },
+
+    calendarBox: {
+        marginTop: 10,
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#eee',
+    },
+
+    // ★今回追加（エラー解消ポイント）
+    saveText: {
+        color: '#2196F3',
+        fontWeight: 'bold',
     },
 });
