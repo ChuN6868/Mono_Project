@@ -48,6 +48,16 @@ export default function HomeLayout() {
         setIsCalendarOpen(false);
     };
 
+    // ★表示フォーマット変換（YYYY-MM-DD → 日本語）
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        const day = d.getDate();
+        return `${y}年${m}月${day}日`;
+    };
+
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
 
@@ -63,7 +73,9 @@ export default function HomeLayout() {
                 <Ionicons name="add" size={24} color="#fff" />
             </Pressable>
 
-            {/* モーダル */}
+            {/* =========================
+                モーダル
+            ========================= */}
             <Modal
                 isVisible={isSheetOpen}
                 onBackdropPress={closeSheet}
@@ -88,12 +100,10 @@ export default function HomeLayout() {
                         </TouchableOpacity>
                     </View>
 
-                    {/* フォーム */}
                     <ScrollView
                         style={styles.scrollArea}
                         contentContainerStyle={styles.scrollContent}
                         keyboardShouldPersistTaps="handled"
-                        showsVerticalScrollIndicator={false}
                     >
 
                         {/* カテゴリ */}
@@ -131,15 +141,23 @@ export default function HomeLayout() {
                             onChangeText={setPlace}
                         />
 
-                        <TouchableOpacity
-                            style={styles.dateBox}
-                            onPress={() => setIsCalendarOpen(true)}
-                        >
-                            <Text style={selectedDate ? styles.dateText : styles.datePlaceholder}>
-                                {selectedDate || 'タップして日付選択'}
-                            </Text>
-                        </TouchableOpacity>
+                        {/* =========================
+                            期限（改善UI）
+                        ========================= */}
+                        <View style={styles.dateRow}>
+                            <Text style={styles.label}>期限</Text>
 
+                            <TouchableOpacity
+                                style={styles.dateInput}
+                                onPress={() => setIsCalendarOpen(true)}
+                            >
+                                <Text style={selectedDate ? styles.dateText : styles.datePlaceholder}>
+                                    {selectedDate ? formatDate(selectedDate) : '選択'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* カレンダー（モーダル） */}
                         {isCalendarOpen && (
                             <View style={styles.calendarBox}>
                                 <Calendar
@@ -172,7 +190,7 @@ export default function HomeLayout() {
 }
 
 /* =========================
-   styles（←ここに追加）
+   styles
 ========================= */
 const styles = StyleSheet.create({
     container: {
@@ -210,7 +228,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        paddingBottom: 8,
     },
 
     scrollArea: {
@@ -219,28 +236,6 @@ const styles = StyleSheet.create({
 
     scrollContent: {
         padding: 16,
-        paddingBottom: 40,
-    },
-
-    adArea: {
-        height: 180,
-        backgroundColor: '#f2f2f2',
-        borderTopWidth: 1,
-        borderColor: '#ddd',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    adTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#666',
-    },
-
-    adSub: {
-        fontSize: 12,
-        color: '#999',
-        marginTop: 6,
     },
 
     input: {
@@ -251,12 +246,28 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
 
-    dateBox: {
+    /* ★今回の改善ポイント */
+    dateRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        justifyContent: 'space-between',
+    },
+
+    label: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: '600',
+    },
+
+    dateInput: {
+        width: 140,            // ★小さくした
+        paddingVertical: 8,
+        paddingHorizontal: 12,
         borderWidth: 1,
         borderColor: '#ddd',
-        padding: 12,
         borderRadius: 8,
-        marginBottom: 12,
+        alignItems: 'center',
     },
 
     dateText: {
@@ -265,6 +276,14 @@ const styles = StyleSheet.create({
 
     datePlaceholder: {
         color: '#999',
+    },
+
+    calendarBox: {
+        marginTop: 10,
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#eee',
     },
 
     segment: {
@@ -295,15 +314,27 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
 
-    calendarBox: {
-        marginTop: 10,
-        borderRadius: 12,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#eee',
+    adArea: {
+        height: 180,
+        backgroundColor: '#f2f2f2',
+        borderTopWidth: 1,
+        borderColor: '#ddd',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
-    // ★今回追加（エラー解消ポイント）
+    adTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#666',
+    },
+
+    adSub: {
+        fontSize: 12,
+        color: '#999',
+        marginTop: 6,
+    },
+
     saveText: {
         color: '#2196F3',
         fontWeight: 'bold',
