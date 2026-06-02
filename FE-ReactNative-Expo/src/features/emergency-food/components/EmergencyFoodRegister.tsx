@@ -16,38 +16,47 @@ import {
   useCategoryRepository,
   useEmergencyFoodRepository,
 } from '@/src/db';
-import { useInventoryRefresh } from '../contexts/InventoryRefreshContext';
+import { useInventoryRefresh } from '../contexts/InventoryContext';
+import type { InventoryItem } from '../types/inventoryItem';
+
+type CategoryName = '保存食' | '飲み物';
 
 /**
- * 非常食登録モーダル
+ * 非常食 登録/編集モーダル
+ *
+ * 【モード】
+ * - editingItem = null  : 新規登録モード（INSERT）
+ * - editingItem = item  : 編集モード（UPDATE）
+ *
+ * UI は完全に共通。editingItem の有無で初期値とSQLだけが切り替わる。
  *
  * 【責務】
  * - フォーム入力の状態管理
- * - DBへの保存（emergencyFoodRepository.create）
- * - 保存成功時：refreshトリガー発火 → 一覧画面が自動再取得
+ * - DBへの保存/更新（emergencyFoodRepository.create / update）
+ * - 成功時：refreshトリガー発火 → 一覧画面が自動再取得
  * - キャンセル/保存時：フォームをリセットして閉じる
- *
- * 【表示制御】
- * isOpen / onClose は親（_layout.tsx）が管理する。
- * このコンポーネントは「中身」だけに責任を持つ。
  */
 export function EmergencyFoodRegister({
   isOpen,
   onClose,
+  editingItem,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  editingItem: InventoryItem | null;
 }) {
   const categoryRepository = useCategoryRepository();
   const emergencyFoodRepository = useEmergencyFoodRepository();
   const { triggerRefresh } = useInventoryRefresh();
+
+  const isEditMode = editingItem !== null;
 
   // フォーム入力state
   const [name, setName] = useState('');
   const [storage, setStorage] = useState('');
   const [selectedDate, setSelectedDate] = useState(''); // 'YYYY-MM-DD'
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [categoryName, setCategoryName] = useState<'保存食' | '飲み物'>('保存食');
+  const [categoryName, setCategoryName] = useState<CategoryName>('保存食');
   const [saving, setSaving] = useState(false);
 
   // カテゴリ名 → ID 解決のため、起動時に1回だけ全カテゴリを取得しておく
@@ -56,17 +65,44 @@ export function EmergencyFoodRegister({
     categoryRepository.findAll().then(setCategories);
   }, [categoryRepository]);
 
-  /** 入力をクリアして閉じる */
-  const resetAndClose = () => {
-    setName('');
-    setStorage('');
-    setSelectedDate('');
-    setCategoryName('保存食');
+  /**
+   * モーダルが開く瞬間にフォームを「適切な初期値」にセットする
+   *
+   * 依存配列に editingItem?.id を入れることで：
+   * - 別アイテムの編集に切り替わった時 → 再populate
+   * - 新規モードに切り替わった時       → reset
+   * - 同じアイテムを再度開いた時       → effectは発火しないが既に正しい状態
+   */
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (editingItem) {
+      // 編集モード：既存値を流し込む
+      setName(editingItem.name);
+      // category は string 型だが実際は 2 種類のいずれか
+      const cat: CategoryName =
+        editingItem.category === '飲み物' ? '飲み物' : '保存食';
+      setCategoryName(cat);
+      // limit は 'YYYY/MM/DD' 表示形式なので '-' 区切りに戻す
+      setSelectedDate(editingItem.limit.replaceAll('/', '-'));
+      setStorage(editingItem.place);
+    } else {
+      // 新規モード：すべて初期値にリセット
+      setName('');
+      setCategoryName('保存食');
+      setSelectedDate('');
+      setStorage('');
+    }
+    setIsCalendarOpen(false);
+  }, [isOpen, editingItem]);
+
+  /** 閉じる（state は次回 open 時に useEffect が再初期化するのでここではクリア不要） */
+  const handleClose = () => {
     setIsCalendarOpen(false);
     onClose();
   };
 
-  /** 保存ボタン押下 */
+  /** 保存ボタン押下：モードに応じて create or update */
   const handleSave = async () => {
     // バリデーション
     if (!name.trim()) {
@@ -90,15 +126,22 @@ export function EmergencyFoodRegister({
 
     setSaving(true);
     try {
-      await emergencyFoodRepository.create({
+      const payload = {
         categoryId: category.id,
         name: name.trim(),
         expirationDate: selectedDate, // 'YYYY-MM-DD'
         storageLocation: storage.trim() || null,
-      });
+      };
+
+      if (isEditMode && editingItem) {
+        await emergencyFoodRepository.update(editingItem.id, payload);
+      } else {
+        await emergencyFoodRepository.create(payload);
+      }
+
       // 一覧画面の useInventoryItems が再取得するように通知
       triggerRefresh();
-      resetAndClose();
+      handleClose();
     } catch (e) {
       Alert.alert('保存失敗', e instanceof Error ? e.message : String(e));
     } finally {
@@ -116,9 +159,9 @@ export function EmergencyFoodRegister({
   return (
     <Modal
       isVisible={isOpen}
-      onBackdropPress={resetAndClose}
+      onBackdropPress={handleClose}
       swipeDirection="down"
-      onSwipeComplete={resetAndClose}
+      onSwipeComplete={handleClose}
       propagateSwipe
       style={styles.modal}
       backdropOpacity={0.4}
@@ -126,17 +169,23 @@ export function EmergencyFoodRegister({
       hideModalContentWhileAnimating
     >
       <View style={styles.sheet}>
-        {/* ヘッダー */}
+        {/* ヘッダー：左=閉じる / 中=タイトル / 右=保存 */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={resetAndClose} disabled={saving}>
-            <Ionicons name="close" size={24} color="#333" />
-          </TouchableOpacity>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={handleClose} disabled={saving}>
+              <Ionicons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity onPress={handleSave} disabled={saving}>
-            <Text style={[styles.saveText, saving && styles.saveTextDisabled]}>
-              {saving ? '保存中...' : '保存'}
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.title}>{isEditMode ? '編集' : '新規登録'}</Text>
+
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={handleSave} disabled={saving}>
+              <Text style={[styles.saveText, saving && styles.saveTextDisabled]}>
+                {saving ? '保存中...' : '保存'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView
@@ -220,11 +269,8 @@ export function EmergencyFoodRegister({
           {isCalendarOpen && (
             <View style={styles.calendarBox}>
               <Calendar
-                // ヘッダーを「2027年 8月」表記に（ロケールだけでは英語語順のままなため必要）
                 monthFormat="yyyy年 M月"
-                // 月を左右スワイプで切り替えられるようにする
                 enableSwipeMonths
-                // 日本語UIに合うテーマ（アプリの青色に統一）
                 theme={{
                   todayTextColor: '#2196F3',
                   arrowColor: '#2196F3',
@@ -279,8 +325,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
   },
+  headerLeft: { minWidth: 60, alignItems: 'flex-start' },
+  headerRight: { minWidth: 60, alignItems: 'flex-end' },
+  title: { fontSize: 16, fontWeight: '600', color: '#333' },
   scrollArea: { flex: 1 },
   scrollContent: { padding: 16 },
   row: {

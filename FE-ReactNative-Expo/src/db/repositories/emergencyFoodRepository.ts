@@ -28,6 +28,15 @@ export type EmergencyFoodRepository = {
     expirationDate: string; // 'YYYY-MM-DD'
     storageLocation: string | null;
   }): Promise<number>;
+  update(
+    id: number,
+    input: {
+      categoryId: number;
+      name: string;
+      expirationDate: string; // 'YYYY-MM-DD'
+      storageLocation: string | null;
+    }
+  ): Promise<void>;
 };
 
 /**
@@ -98,6 +107,28 @@ export function createEmergencyFoodRepository(
         [categoryId, name, expirationDate, storageLocation]
       );
       return result.lastInsertRowId;
+    },
+
+    /**
+     * 更新
+     *
+     * 【updated_at の扱い】
+     * DDL の DEFAULT は INSERT 時にしか効かないため、UPDATE では明示的に
+     * 同じ strftime() で現時刻を上書きする。
+     * （DBレベルで保証したい場合は AFTER UPDATE トリガーを追加する手もあるが、
+     *   Repository集中管理のほうがシンプルなので現状はこちら。）
+     */
+    async update(id, { categoryId, name, expirationDate, storageLocation }) {
+      await db.runAsync(
+        `UPDATE emergency_foods
+           SET category_id         = ?,
+               emergency_food_name = ?,
+               expiration_date     = ?,
+               storage_location    = ?,
+               updated_at          = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+         WHERE emergency_food_id = ?`,
+        [categoryId, name, expirationDate, storageLocation, id]
+      );
     },
   };
 }

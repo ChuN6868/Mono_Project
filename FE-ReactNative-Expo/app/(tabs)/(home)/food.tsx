@@ -1,4 +1,5 @@
 import { useInventoryItems } from '@/src/features/emergency-food/hooks/useInventoryItems';
+import { useInventoryModal } from '@/src/features/emergency-food/contexts/InventoryContext';
 import { EmergencyFoodList } from '@/src/features/emergency-food/components/EmergencyFoodList';
 
 /**
@@ -6,5 +7,6 @@ import { EmergencyFoodList } from '@/src/features/emergency-food/components/Emer
  */
 export default function FoodScreen() {
     const { items } = useInventoryItems('保存食');
-    return <EmergencyFoodList items={items} />;
+    const { openEditModal } = useInventoryModal();
+    return <EmergencyFoodList items={items} onItemPress={openEditModal} />;
 }

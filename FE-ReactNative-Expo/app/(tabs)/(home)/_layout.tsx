@@ -9,9 +9,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AdBanner } from '@/src/features/ads';
 import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { EmergencyFoodRegister } from '@/src/features/emergency-food/components/EmergencyFoodRegister';
-import { InventoryRefreshProvider } from '@/src/features/emergency-food/contexts/InventoryRefreshContext';
+import {
+    InventoryProvider,
+    useInventoryModal,
+} from '@/src/features/emergency-food/contexts/InventoryContext';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -23,39 +25,53 @@ const MaterialTopTabs = withLayoutContext<
 >(Navigator);
 
 /**
+ * 内側のレイアウト
+ *
+ * useInventoryModal が Provider 配下である必要があるため、
+ * Provider と分離して内側コンポーネントに切り出している。
+ */
+function HomeLayoutInner() {
+    const { modalIsOpen, modalEditingItem, openCreateModal, closeModal } =
+        useInventoryModal();
+
+    return (
+        <SafeAreaView style={styles.container} edges={['top']}>
+            <AdBanner />
+
+            <MaterialTopTabs>
+                <MaterialTopTabs.Screen name="index" options={{ title: 'すべて' }} />
+                <MaterialTopTabs.Screen name="food" options={{ title: '非常食' }} />
+                <MaterialTopTabs.Screen name="drink" options={{ title: '飲み物' }} />
+            </MaterialTopTabs>
+
+            {/* FAB：新規登録モードでモーダルを開く */}
+            <Pressable style={styles.fab} onPress={openCreateModal}>
+                <Ionicons name="add" size={24} color="#fff" />
+            </Pressable>
+
+            {/* モーダルは新規/編集の両方を兼ねる。editingItemの有無で内部が切替わる */}
+            <EmergencyFoodRegister
+                isOpen={modalIsOpen}
+                onClose={closeModal}
+                editingItem={modalEditingItem}
+            />
+        </SafeAreaView>
+    );
+}
+
+/**
  * (home) 配下の画面共通レイアウト
  *
  * 【責務】
- * - タブ枠（すべて / 非常食 / 飲み物）の提供
- * - FAB（追加ボタン）の提供と開閉state管理
- * - 登録モーダル <EmergencyFoodRegister /> の配置
- * - InventoryRefreshProvider でタブ配下を包む
- *   （モーダルからの保存通知が各タブの一覧に届くようにするため）
+ * - InventoryProvider でタブ配下を包む
+ *   （カードタップ→編集モーダル open、保存→一覧再取得 の連携用Context）
+ * - タブ枠、FAB、登録/編集モーダルを配置
  */
 export default function HomeLayout() {
-    const [isOpen, setIsOpen] = useState(false);
-
     return (
-        <InventoryRefreshProvider>
-            <SafeAreaView style={styles.container} edges={['top']}>
-                <AdBanner />
-
-                <MaterialTopTabs>
-                    <MaterialTopTabs.Screen name="index" options={{ title: 'すべて' }} />
-                    <MaterialTopTabs.Screen name="food" options={{ title: '非常食' }} />
-                    <MaterialTopTabs.Screen name="drink" options={{ title: '飲み物' }} />
-                </MaterialTopTabs>
-
-                <Pressable style={styles.fab} onPress={() => setIsOpen(true)}>
-                    <Ionicons name="add" size={24} color="#fff" />
-                </Pressable>
-
-                <EmergencyFoodRegister
-                    isOpen={isOpen}
-                    onClose={() => setIsOpen(false)}
-                />
-            </SafeAreaView>
-        </InventoryRefreshProvider>
+        <InventoryProvider>
+            <HomeLayoutInner />
+        </InventoryProvider>
     );
 }
 

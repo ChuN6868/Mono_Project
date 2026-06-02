@@ -8,13 +8,20 @@ import { InventoryCard } from './InventoryCard';
  * 【責務】
  * - 受け取った items を FlatList で並べる
  * - 0件の時は「未登録」の文言を出す
+ * - 各カードのタップ通知（onItemPress）を上位に伝搬する
  *
  * 【意図的にやらないこと】
  * - データ取得（screenの useInventoryItems が担当）
  * - ローディング表示（screen側で出し分ける想定）
  * - 個別カードのスタイル定義（InventoryCard が担当）
  */
-export function EmergencyFoodList({ items }: { items: InventoryItem[] }) {
+export function EmergencyFoodList({
+  items,
+  onItemPress,
+}: {
+  items: InventoryItem[];
+  onItemPress?: (item: InventoryItem) => void;
+}) {
   if (items.length === 0) {
     return (
       <View style={styles.empty}>
@@ -29,7 +36,9 @@ export function EmergencyFoodList({ items }: { items: InventoryItem[] }) {
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={[styles.list, { paddingBottom: 100 }]}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
-      renderItem={({ item }) => <InventoryCard item={item} />}
+      renderItem={({ item }) => (
+        <InventoryCard item={item} onPress={onItemPress} />
+      )}
     />
   );
 }

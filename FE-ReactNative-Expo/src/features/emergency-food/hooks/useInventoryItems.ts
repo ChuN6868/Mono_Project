@@ -4,7 +4,7 @@ import {
   type InventoryItem,
   toInventoryItem,
 } from '../types/inventoryItem';
-import { useInventoryRefresh } from '../contexts/InventoryRefreshContext';
+import { useInventoryRefresh } from '../contexts/InventoryContext';
 
 type UseInventoryItemsResult = {
   items: InventoryItem[];
