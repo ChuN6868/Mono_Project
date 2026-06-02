@@ -102,6 +102,38 @@ export function EmergencyFoodRegister({
     onClose();
   };
 
+  /** 削除：確認ダイアログ → DBから物理削除 → 一覧再取得 → モーダルclose */
+  const handleDelete = () => {
+    if (!editingItem) return;
+
+    Alert.alert(
+      '削除確認',
+      `「${editingItem.name}」を削除します。よろしいですか？`,
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            setSaving(true);
+            try {
+              await emergencyFoodRepository.delete(editingItem.id);
+              triggerRefresh();
+              handleClose();
+            } catch (e) {
+              Alert.alert(
+                '削除失敗',
+                e instanceof Error ? e.message : String(e)
+              );
+            } finally {
+              setSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   /** 保存ボタン押下：モードに応じて create or update */
   const handleSave = async () => {
     // バリデーション
@@ -298,6 +330,26 @@ export function EmergencyFoodRegister({
             value={storage}
             onChangeText={setStorage}
           />
+
+          {/* 削除：編集モード時のみ表示
+              ・ゴーストボタン（背景なし・赤テキスト）で意図的にトーンを落とす
+              ・上に細いディバイダーを置いて「危険ゾーン」を視覚分離
+              ・破壊的アクションは目立ちすぎないのがモダンUXの基本 */}
+          {isEditMode && (
+            <View style={styles.dangerZone}>
+              <View style={styles.dangerDivider} />
+              <TouchableOpacity
+                style={[styles.deleteButton, saving && styles.deleteButtonDisabled]}
+                onPress={handleDelete}
+                disabled={saving}
+                activeOpacity={0.4}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="trash-outline" size={16} color="#FF3B30" />
+                <Text style={styles.deleteButtonText}>このアイテムを削除</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
 
         {/* 広告 */}
@@ -417,5 +469,32 @@ const styles = StyleSheet.create({
   },
   saveTextDisabled: {
     color: '#aaa',
+  },
+  dangerZone: {
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  dangerDivider: {
+    height: StyleSheet.hairlineWidth, // 端末の最小線幅。OS問わず細く綺麗に出る
+    backgroundColor: '#E5E5EA',       // iOS systemGray5 相当
+    width: '100%',
+    marginBottom: 16,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    // ゴーストボタン：背景・枠線なし
+  },
+  deleteButtonDisabled: {
+    opacity: 0.4,
+  },
+  deleteButtonText: {
+    color: '#FF3B30', // iOS System Red
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.2,
   },
 });

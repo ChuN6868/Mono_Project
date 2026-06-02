@@ -37,6 +37,7 @@ export type EmergencyFoodRepository = {
       storageLocation: string | null;
     }
   ): Promise<void>;
+  delete(id: number): Promise<void>;
 };
 
 /**
@@ -128,6 +129,18 @@ export function createEmergencyFoodRepository(
                updated_at          = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
          WHERE emergency_food_id = ?`,
         [categoryId, name, expirationDate, storageLocation, id]
+      );
+    },
+
+    /**
+     * 削除
+     * emergency_foods はカテゴリマスタの子（参照する側）なのでFK制約に引っかからない。
+     * 物理削除を採用。論理削除（deleted_at列）にしたい場合はDDL変更が必要。
+     */
+    async delete(id) {
+      await db.runAsync(
+        `DELETE FROM emergency_foods WHERE emergency_food_id = ?`,
+        [id]
       );
     },
   };
