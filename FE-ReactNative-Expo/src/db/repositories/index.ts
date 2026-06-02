@@ -4,3 +4,5 @@
  * 新Repositoryを追加したら、ここに1行追記する
  */
 export * from './userRepository';
+export * from './categoryRepository';
+export * from './emergencyFoodRepository';

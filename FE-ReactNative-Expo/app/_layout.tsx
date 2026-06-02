@@ -2,6 +2,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+// 副作用import：react-native-calendars を日本語化（appの最も早い時点で1回実行されればよい）
+import '@/src/lib/calendarLocale';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { DatabaseProvider } from '@/src/db';

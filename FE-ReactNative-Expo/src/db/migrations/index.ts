@@ -1,6 +1,8 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { MigrationError } from '../errors';
 import m001 from './001_create_users';
+import m002 from './002_create_category_mst';
+import m003 from './003_create_emergency_foods';
 
 /**
  * マイグレーション登録リスト
@@ -12,7 +14,7 @@ import m001 from './001_create_users';
  *
  * sort() を入れているので、配列順序を間違えても version 昇順で実行される
  */
-const MIGRATIONS = [m001].sort((a, b) => a.version - b.version);
+const MIGRATIONS = [m001, m002, m003].sort((a, b) => a.version - b.version);
 
 /**
  * 未適用のマイグレーションを順次実行する

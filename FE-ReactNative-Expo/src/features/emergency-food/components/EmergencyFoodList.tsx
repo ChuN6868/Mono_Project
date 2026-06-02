@@ -1,30 +1,55 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import type { InventoryItem } from '../types/inventoryItem';
+import { InventoryCard } from './InventoryCard';
 
-export const EmergencyFoodList = () => {
+/**
+ * 在庫一覧の純粋表示コンポーネント
+ *
+ * 【責務】
+ * - 受け取った items を FlatList で並べる
+ * - 0件の時は「未登録」の文言を出す
+ *
+ * 【意図的にやらないこと】
+ * - データ取得（screenの useInventoryItems が担当）
+ * - ローディング表示（screen側で出し分ける想定）
+ * - 個別カードのスタイル定義（InventoryCard が担当）
+ */
+export function EmergencyFoodList({ items }: { items: InventoryItem[] }) {
+  if (items.length === 0) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>すべて　食料品　水</Text>
+      <View style={styles.empty}>
+        <Text style={styles.emptyText}>登録された非常食はありません</Text>
+      </View>
+    );
+  }
 
-            <View style={styles.button}>
-                <Button title="testボタン" onPress={() => console.log('ボタンが押下されました')} />
-            </View>
-        </View>
-    )
+  return (
+    <FlatList
+      data={items}
+      keyExtractor={(item) => item.id.toString()}
+      contentContainerStyle={[styles.list, { paddingBottom: 100 }]}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      renderItem={({ item }) => <InventoryCard item={item} />}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1, // 親いっぱいに広がるという意味。Viewの高さを画面全体にするために必要。
-        justifyContent: 'center', // 縦中央
-        alignItems: 'center',     // 横中央
-    },
-
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
-
-    button: {
-        width: 200, // ボタンの横幅を調整したい場合
-    },
+  list: {
+    padding: 12,
+    backgroundColor: '#f5f5f5',
+  },
+  separator: {
+    height: 10,
+  },
+  empty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  emptyText: {
+    color: '#999',
+    fontSize: 14,
+  },
 });

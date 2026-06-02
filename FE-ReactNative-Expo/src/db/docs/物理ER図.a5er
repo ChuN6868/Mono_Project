@@ -41,23 +41,23 @@ ShowDisableAttributes=0
 BugFixEntityWidth=1
 
 [Entity]
-PName=emergency-food
+PName=emergency_foods
 LName=非常食
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=500
 Top=250
 Field="非常食ID","emergency_food_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="カテゴリID","category_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="非常食名","emergency_food_name","","NOT NULL",,"","",$FFFFFFFF,""
-Field="期限","expired","","NOT NULL",,"","",$FFFFFFFF,""
-Field="保管場所","place","","NOT NULL",,"","",$FFFFFFFF,""
+Field="期限","expiration_date","","NOT NULL",,"","",$FFFFFFFF,""
+Field="保管場所","storage_location","","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20260602000533
+ModifiedDateTime=20260602232912
 Position="Main",500,250,503,167
 ZOrder=1
 
@@ -81,7 +81,7 @@ ZOrder=2
 
 [Relation]
 Entity1=category_mst
-Entity2=emergency-food
+Entity2=emergency_foods
 RelationType1=2
 RelationType2=3
 Fields1=category_id

@@ -16,8 +16,10 @@ export { DatabaseProvider, useDatabase } from './client';
 // Repository（Reactフックも含む）
 export * from './repositories';
 
-// Domain型（User など。Row型は内部実装なのでexportしない）
+// Domain型（Row型は内部実装なのでexportしない）
 export type { User } from './schema/users';
+export type { Category } from './schema/categoryMst';
+export type { EmergencyFood } from './schema/emergencyFoods';
 
 // 型付きエラー（ErrorBoundary側で instanceof 判定するため）
 export { DatabaseError, MigrationError } from './errors';
