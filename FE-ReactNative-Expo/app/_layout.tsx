@@ -4,8 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
-import { migrate } from '@/src/db/migrations';
+import { DatabaseProvider } from '@/src/db';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -14,18 +13,18 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  // ★ここが重要（DB初期化）
-  useEffect(() => {
-    migrate();
-  }, []);
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    // ★DatabaseProviderで全体をラップする
+    // children が描画される前にDB初期化（PRAGMA設定・マイグレーション・seed）が完了している保証がある
+    // useEffect で migrate() を呼んでいた旧実装より、初期化漏れ・タイミング事故が起きにくい
+    <DatabaseProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </DatabaseProvider>
   );
 }

@@ -1,0 +1,103 @@
+﻿# A5:ER FORMAT:21
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright © 2007 m.matsubara
+# A5:SQL Mk-2 Version 2.21.1 Copyright © 1997 - 2026 m.matsubara
+#  https://a5m2.mmatsubara.com
+
+[Manager]
+ProjectName=EmergencyFood
+Author=
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+PageInfo="Main",7,"A3Landscape",$FFFFFF
+PageInfo="マスタ",7,"A3Landscape",$FFFFFF
+LogicalView=1
+DecodeDomain=0
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=6
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSType=7
+RDBMSTypeName=PostgreSQL
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+UpperCaseKeyword=0
+CommonField="作成日","created_at","","NOT NULL",,"","",$FFFFFFFF
+CommonField="更新日","updated_at","","NOT NULL",,"","",$FFFFFFFF
+ShowTag=1
+ShowCommonAttributes=0
+ShowDisableAttributes=0
+BugFixEntityWidth=1
+
+[Entity]
+PName=emergency-food
+LName=非常食
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=500
+Top=250
+Field="非常食ID","emergency_food_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="カテゴリID","category_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="非常食名","emergency_food_name","","NOT NULL",,"","",$FFFFFFFF,""
+Field="期限","expired","","NOT NULL",,"","",$FFFFFFFF,""
+Field="保管場所","place","","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20260602000533
+Position="Main",500,250,503,167
+ZOrder=1
+
+[Entity]
+PName=category_mst
+LName=カテゴリマスタ
+Comment=
+TableInnerOption=
+TableOption=
+Page=マスタ
+Left=600
+Top=250
+Field="カテゴリID","category_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="カテゴリ名","category_name","","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20260602000514
+Position="マスタ",600,250
+ZOrder=2
+
+[Relation]
+Entity1=category_mst
+Entity2=emergency-food
+RelationType1=2
+RelationType2=3
+Fields1=category_id
+Fields2=category_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,1505,8495,2579,R,R,""
+Position="マスタ",0,3271,8449,1281,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20260602000610
+LineMode=0
+Bar1=150
+Bar2=850
+Bar3=258
+TermPos1=R
+TermPos2=R
+ZOrder=3

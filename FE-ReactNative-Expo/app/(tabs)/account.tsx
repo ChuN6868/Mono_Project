@@ -1,19 +1,15 @@
-import { getUsers } from '@/src/repositories/hogeRepository';
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
-
-/**
- * Userテーブルの型定義
- * SQLiteから取得したデータの構造を表す
- */
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  created_at: string;
-};
+import { useUserRepository, type User } from '@/src/db';
 
 export default function TabTwoScreen() {
+  /**
+   * UserRepository を取得
+   * ※内部で useDatabase → SQLiteProvider のDBに繋がる
+   * ※useMemo されているので、再レンダリングで作り直されない
+   */
+  const userRepository = useUserRepository();
+
   /**
    * 画面表示用のユーザー一覧ステート
    * 初期値は空配列
@@ -23,16 +19,18 @@ export default function TabTwoScreen() {
   /**
    * 画面初回表示時にユーザーデータを取得
    *
-   * ※useEffect([])なのでマウント時に1回だけ実行される
-   * ※Repository層からDBデータを取得してstateに反映
+   * ※async関数はuseEffectのコールバックに直接渡せないので、
+   *   中でasync関数を定義して呼び出す
+   * ※依存配列に userRepository を入れているが、
+   *   useMemo化されているので無限ループにはならない
    */
   useEffect(() => {
-    // SQLiteからユーザー一覧を取得
-    const data = getUsers();
-
-    // 取得したデータをstateに保存し画面再レンダリング
-    setUsers(data);
-  }, []);
+    const load = async () => {
+      const data = await userRepository.findAll();
+      setUsers(data);
+    };
+    load();
+  }, [userRepository]);
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
