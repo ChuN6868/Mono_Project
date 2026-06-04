@@ -38,6 +38,8 @@ export type EmergencyFoodRepository = {
     }
   ): Promise<void>;
   delete(id: number): Promise<void>;
+  /** 全件削除（設定画面の「すべてのデータをリセット」用） */
+  deleteAll(): Promise<void>;
 };
 
 /**
@@ -142,6 +144,17 @@ export function createEmergencyFoodRepository(
         `DELETE FROM emergency_foods WHERE emergency_food_id = ?`,
         [id]
       );
+    },
+
+    /**
+     * 全件物理削除
+     *
+     * 【注意】
+     * カテゴリマスタは触らない。AUTOINCREMENT のシーケンスはリセットしない
+     * （次回登録時のidが連番継続のほうが自然なため）。
+     */
+    async deleteAll() {
+      await db.runAsync(`DELETE FROM emergency_foods`);
     },
   };
 }

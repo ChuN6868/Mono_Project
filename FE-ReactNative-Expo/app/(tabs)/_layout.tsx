@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  // ここで画面下部にタブがあり、その他を切り替えるという構造を決定している
   return (
     <Tabs
       screenOptions={{
@@ -24,10 +25,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="account" // app/(tabs)/account.tsxが存在する必要がある。
+        name="settings" // app/(tabs)/settings.tsxが存在する必要がある。
         options={{
-          title: 'アカウント',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
+          title: '設定',
+          tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
         }}
       />
     </Tabs>

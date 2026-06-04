@@ -10,10 +10,7 @@ import { AdBanner } from '@/src/features/ads';
 import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { EmergencyFoodRegister } from '@/src/features/emergency-food/components/EmergencyFoodRegister';
-import {
-    InventoryProvider,
-    useInventoryModal,
-} from '@/src/features/emergency-food/contexts/InventoryContext';
+import { useInventoryModal } from '@/src/features/emergency-food/contexts/InventoryContext';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -40,7 +37,7 @@ function HomeLayoutInner() {
 
             <MaterialTopTabs>
                 <MaterialTopTabs.Screen name="index" options={{ title: 'すべて' }} />
-                <MaterialTopTabs.Screen name="food" options={{ title: '非常食' }} />
+                <MaterialTopTabs.Screen name="food" options={{ title: '保存食' }} />
                 <MaterialTopTabs.Screen name="drink" options={{ title: '飲み物' }} />
             </MaterialTopTabs>
 
@@ -63,16 +60,14 @@ function HomeLayoutInner() {
  * (home) 配下の画面共通レイアウト
  *
  * 【責務】
- * - InventoryProvider でタブ配下を包む
- *   （カードタップ→編集モーダル open、保存→一覧再取得 の連携用Context）
  * - タブ枠、FAB、登録/編集モーダルを配置
+ *
+ * 【補足】
+ * InventoryProvider は app/_layout.tsx にて全画面共通でラップしているため、
+ * ここでは Provider を意識しない（settings からも refresh を呼ぶ必要があるため）。
  */
 export default function HomeLayout() {
-    return (
-        <InventoryProvider>
-            <HomeLayoutInner />
-        </InventoryProvider>
-    );
+    return <HomeLayoutInner />;
 }
 
 const styles = StyleSheet.create({

@@ -18,6 +18,11 @@ import {
 } from '@/src/db';
 import { useInventoryRefresh } from '../contexts/InventoryContext';
 import type { InventoryItem } from '../types/inventoryItem';
+import { useNotificationSettings } from '@/src/features/settings/hooks/useNotificationSettings';
+import {
+  cancelExpirationNotification,
+  scheduleExpirationNotification,
+} from '@/src/lib/notifications';
 
 type CategoryName = '保存食' | '飲み物';
 
@@ -48,6 +53,7 @@ export function EmergencyFoodRegister({
   const categoryRepository = useCategoryRepository();
   const emergencyFoodRepository = useEmergencyFoodRepository();
   const { triggerRefresh } = useInventoryRefresh();
+  const { settings: notificationSettings } = useNotificationSettings();
 
   const isEditMode = editingItem !== null;
 
@@ -118,6 +124,8 @@ export function EmergencyFoodRegister({
             setSaving(true);
             try {
               await emergencyFoodRepository.delete(editingItem.id);
+              // 予約済みの期限通知も同時にキャンセル
+              await cancelExpirationNotification(editingItem.id);
               triggerRefresh();
               handleClose();
             } catch (e) {
@@ -165,11 +173,24 @@ export function EmergencyFoodRegister({
         storageLocation: storage.trim() || null,
       };
 
+      let targetId: number;
       if (isEditMode && editingItem) {
         await emergencyFoodRepository.update(editingItem.id, payload);
+        targetId = editingItem.id;
       } else {
-        await emergencyFoodRepository.create(payload);
+        targetId = await emergencyFoodRepository.create(payload);
       }
+
+      // 期限通知をスケジュール（settings.enabledがfalseなら関数内部でスキップ）
+      // 旧予約は scheduleExpirationNotification 内で自動キャンセルされる
+      await scheduleExpirationNotification(
+        {
+          id: targetId,
+          name: payload.name,
+          expirationDate: payload.expirationDate,
+        },
+        notificationSettings
+      );
 
       // 一覧画面の useInventoryItems が再取得するように通知
       triggerRefresh();
